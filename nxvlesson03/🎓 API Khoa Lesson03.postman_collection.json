@@ -1,0 +1,131 @@
+{
+	"info": {
+		"_postman_id": "3cf5fa4c-3da8-432f-906a-e419d43ed3dd",
+		"name": "🎓 API Khoa Lesson03",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49391101",
+		"_collection_link": "https://vinhnguyendepzai-1500588.postman.co/workspace/VinhNguyen's-Workspace~58826977-2db8-4781-8c13-cca28b418266/collection/49391101-3cf5fa4c-3da8-432f-906a-e419d43ed3dd?action=share&source=collection_link&creator=49391101"
+	},
+	"item": [
+		{
+			"name": "localhost:8080/khoa-list",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/khoa-list",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"khoa-list"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/khoa/CNTT",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/khoa/CNTT",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"khoa",
+						"CNTT"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Khoa",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"makh\": \"CNTT\",\r\n    \"tenkh\": \"IT\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/khoa-add",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"khoa-add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit Khoa",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"makh\": \"HH\",\r\n    \"tenkh\": \"Hoa Hậu 2.0\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/khoa/CNTT",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"khoa",
+						"CNTT"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Khoa",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"makh\": \"HH\",\r\n    \"tenkh\": \"Hoa Hậu\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/khoa/CNTT",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"khoa",
+						"CNTT"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

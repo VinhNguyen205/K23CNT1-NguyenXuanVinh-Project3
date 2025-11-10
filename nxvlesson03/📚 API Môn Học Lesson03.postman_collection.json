@@ -1,0 +1,142 @@
+{
+	"info": {
+		"_postman_id": "5e8256d8-b5c8-4ade-9c88-08e2309da377",
+		"name": "📚 API Môn Học Lesson03",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49391101",
+		"_collection_link": "https://vinhnguyendepzai-1500588.postman.co/workspace/VinhNguyen's-Workspace~58826977-2db8-4781-8c13-cca28b418266/collection/49391101-5e8256d8-b5c8-4ade-9c88-08e2309da377?action=share&source=collection_link&creator=49391101"
+	},
+	"item": [
+		{
+			"name": "Lấy tất cả Môn học",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/monhoc-list",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"monhoc-list"
+					]
+				},
+				"description": "Trả về danh sách tất cả Môn học. Không cần tham số."
+			},
+			"response": []
+		},
+		{
+			"name": "Lấy 1 Môn học",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/monhoc/Java",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"monhoc",
+						"Java"
+					]
+				},
+				"description": "Lấy thông tin 1 Môn học theo mã môn học. Sử dụng biến đường dẫn {{maMon}} (ví dụ: Java)."
+			},
+			"response": []
+		},
+		{
+			"name": "Thêm Môn học mới",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"maMon\": \"Java\",\n  \"tenMon\": \"Lập trình Java\",\n  \"soTinChi\": 3\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/monhoc-add",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"monhoc-add"
+					]
+				},
+				"description": "Thêm mới 1 Môn học. Cập nhật body JSON theo cấu trúc API. Đảm bảo đặt header Content-Type: application/json."
+			},
+			"response": []
+		},
+		{
+			"name": "Sửa Môn học",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"tenMon\": \"Lập trình Java nâng cao\",\n  \"soTinChi\": 4\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/monhoc/{{maMon}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"monhoc",
+						"{{maMon}}"
+					]
+				},
+				"description": "Cập nhật thông tin Môn học theo mã môn học. Sử dụng biến {{maMon}} (ví dụ: Java)."
+			},
+			"response": []
+		},
+		{
+			"name": "Xóa Môn học",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/monhoc/{{maMon}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"monhoc",
+						"{{maMon}}"
+					]
+				},
+				"description": "Xóa Môn học theo mã môn học. Sử dụng biến {{maMon}} (ví dụ: Java)."
+			},
+			"response": []
+		}
+	]
+}
