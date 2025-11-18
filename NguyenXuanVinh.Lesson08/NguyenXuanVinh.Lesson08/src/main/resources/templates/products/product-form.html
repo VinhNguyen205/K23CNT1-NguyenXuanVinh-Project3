@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Product Form</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+<body class="container mt-5">
+<h2 th:text="${product.id == null ? 'Create Product' : 'Edit Product'}">Product Form</h2>
+<form th:action="${product.id == null} ? @{/products/new} : @{/products/update/{id}(id=${product.id})}"
+      th:object="${product}" method="post" class="card p-3">
+
+    <input type="hidden" th:if="${product.id != null}" th:field="*{id}">
+
+    <div class="mb-3">
+        <label for="name" class="form-label">Name:</label>
+        <input type="text" th:field="*{name}" class="form-control" id="name" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="imgUrl" class="form-label">Image URL:</label>
+        <input type="text" th:field="*{imgUrl}" class="form-control" id="imgUrl">
+    </div>
+
+    <div class="mb-3">
+        <label for="price" class="form-label">Price:</label>
+        <input type="number" step="0.01" th:field="*{price}" class="form-control" id="price">
+    </div>
+
+    <div class="mb-3">
+        <label for="quantity" class="form-label">Quantity:</label>
+        <input type="number" th:field="*{quantity}" class="form-control" id="quantity">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Configurations:</label>
+        <div class="d-flex">
+            <div th:each="config : ${allConfigs}" class="form-check mx-2">
+                <input class="form-check-input"
+                       type="checkbox"
+                       name="configIds"
+                       th:value="${config.id}"
+                       th:id="${'chkCfg_' + config.id}"
+                       th:checked="${product.configurations.contains(config)}">
+                <label class="form-check-label" th:for="${'chkCfg_' + config.id}" th:text="${config.name}"></label>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-3 form-check">
+        <input type="checkbox" th:field="*{isActive}" class="form-check-input" id="isActive" checked>
+        <label class="form-check-label" for="isActive">Active</label>
+    </div>
+
+    <button type="submit" class="btn btn-success" th:text="${product.id == null ? 'Create' : 'Update'}">Save</button>
+    <a th:href="@{/products}" class="btn btn-secondary mt-2">Back to list</a>
+</form>
+</body>
+</html>
