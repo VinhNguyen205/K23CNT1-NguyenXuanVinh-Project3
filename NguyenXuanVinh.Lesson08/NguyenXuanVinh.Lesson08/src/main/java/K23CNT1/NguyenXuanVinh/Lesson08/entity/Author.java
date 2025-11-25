@@ -16,7 +16,7 @@ import java.util.List;
 public class Author {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String code;
@@ -28,12 +28,8 @@ public class Author {
     private String address;
     private Boolean isActive;
 
-    /**
-     * Tạo mối quan hệ với bảng book (Many-to-Many)
-     * mappedBy = "authors": Chỉ ra rằng mối quan hệ này
-     * đã được định nghĩa bởi trường 'authors' ở bên class Book.
-     * Bên này sẽ không tạo ra bảng trung gian.
-     */
-    @ManyToMany(mappedBy = "authors")
-    private List<Book> books = new ArrayList<>();
+    // --- ĐOẠN NÀY ĐÃ ĐƯỢC SỬA ---
+    // Thay vì @ManyToMany cũ, ta chuyển sang @OneToMany trỏ về bảng trung gian
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookAuthor> bookAuthors = new ArrayList<>();
 }

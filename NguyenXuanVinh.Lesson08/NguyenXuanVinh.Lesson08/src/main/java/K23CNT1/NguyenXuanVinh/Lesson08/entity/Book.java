@@ -4,11 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
+@Table(name = "book")
 @Data
 @Builder
 @AllArgsConstructor
@@ -18,8 +17,9 @@ import java.util.Set;
 public class Book {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // Sửa lại IDENTITY cho chuẩn MySQL
     private Long id;
+
     private String code;
     private String name;
     private String description;
@@ -28,11 +28,8 @@ public class Book {
     private Double price;
     private Boolean isActive;
 
-    @ManyToMany
-    @JoinTable(
-            name = "Book_Author",
-            joinColumns = @JoinColumn(name = "bookId"),
-            inverseJoinColumns = @JoinColumn(name = "authorId")
-    )
-    private List<Author> authors = new ArrayList<>();
+    // --- ĐOẠN NÀY THAY ĐỔI ---
+    // Thay vì @ManyToMany trực tiếp, ta dùng OneToMany sang bảng trung gian
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookAuthor> bookAuthors = new ArrayList<>();
 }
