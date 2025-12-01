@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Blind Box Shop - Gacha Game</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header>
+    <div class="logo">🎁 Mystery Box</div>
+    <div class="user-info" th:if="${user != null}">
+        <span>Xin chào, <b th:text="${user.fullName}">User</b></span>
+        <div class="wallet">
+            💰 <span th:text="${#numbers.formatDecimal(user.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span> VNĐ
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <h1 class="title">✨ SÀN ĐẤU NHÂN PHẨM ✨</h1>
+
+    <div class="box-grid">
+        <div class="box-card" th:each="box : ${boxes}">
+            <div class="box-image">
+                <img th:src="${box.imageUrl != null ? box.imageUrl : 'https://cdn-icons-png.flaticon.com/512/4531/4531990.png'}" alt="Box Image">
+            </div>
+            <div class="box-info">
+                <h3 th:text="${box.boxName}">Tên Hộp</h3>
+                <p class="price" th:text="${#numbers.formatDecimal(box.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">100.000 đ</p>
+
+                <button class="btn-buy" th:onclick="'openBox(' + ${box.boxId} + ')'">🔥 MỞ NGAY</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Hàm gọi API Mở Hộp
+    function openBox(boxId) {
+        // ID User tạm thời fix cứng là 1 (sau này sẽ lấy từ session)
+        const userId = 1;
+
+        // Hiện thông báo đang xử lý...
+        Swal.fire({
+            title: 'Đang mở hộp...',
+            html: 'Chờ xíu nhé, đang cầu nguyện nhân phẩm! 🙏',
+            timerProgressBar: true,
+            didOpen: () => { Swal.showLoading() }
+        });
+
+        // Gọi API Backend (POST)
+        fetch(`/api/blindbox/open?userId=${userId}&boxId=${boxId}`, {
+            method: 'POST'
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Lỗi mạng hoặc hết tiền!");
+            return response.json();
+        })
+        .then(data => {
+            // Xử lý kết quả trả về từ Backend
+            showResult(data);
+        })
+        .catch(error => {
+            Swal.fire('Lỗi!', 'Bạn không đủ tiền hoặc có lỗi xảy ra.', 'error');
+        });
+    }
+
+    // Hàm hiển thị kết quả trúng thưởng
+    function showResult(data) {
+       // Kiểm tra độ hiếm để đổi màu tiêu đề
+let titleColor = '#000';
+if (data.rarity === 'S') titleColor = '#ffd700'; // Vàng
+else if (data.rarity === 'A') titleColor = '#c92a2a'; // Đỏ
+else if (data.rarity === 'B') titleColor = '#9b59b6'; // Tím (Thêm cái này nếu thích)
+else if (data.rarity === 'C') titleColor = '#3498db'; // Xanh dương (Mới thêm)
+
+        Swal.fire({
+            title: `<span style="color:${titleColor}">🎉 BẠN TRÚNG: ${data.rarity} 🎉</span>`,
+            html: `
+                <div style="text-align:center">
+                    <img src="${data.itemImage || 'https://via.placeholder.com/150'}" style="width:150px; margin:10px auto; display:block; border-radius:10px;">
+                    <h3>${data.itemName}</h3>
+                    <p>Số dư còn lại: <b>${new Intl.NumberFormat().format(data.currentBalance)} đ</b></p>
+                </div>
+            `,
+            confirmButtonText: 'Tuyệt vời!',
+            background: '#fff url(/images/confetti.gif)' // Nếu có ảnh pháo hoa thì thêm vào
+        }).then(() => {
+            // Sau khi tắt popup thì load lại trang để cập nhật số dư
+            location.reload();
+        });
+    }
+</script>
+
+</body>
+</html>
