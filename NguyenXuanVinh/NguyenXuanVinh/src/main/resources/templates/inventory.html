@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Kho Đồ Của Tôi</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header>
+    <div class="logo"><a href="/" style="text-decoration:none; color:#e94560;">🎁 Mystery Box</a></div>
+    <div class="menu">
+        <a href="/" class="nav-link">🏠 Trang Chủ</a>
+        <a href="/inventory" class="nav-link active">🎒 Kho Đồ</a>
+        <a href="/admin" class="nav-link admin-btn" th:if="${user != null and user.isAdmin}">🛠️ Quản Trị</a>
+    </div>
+    <div class="user-info" th:if="${user != null}">
+        <span>Xin chào, <b th:text="${user.fullName}">User</b></span>
+        <div class="wallet">
+            💰 <span id="wallet-balance" th:text="${#numbers.formatDecimal(user.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span> VNĐ
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <h1 class="title">🎒 TỦ ĐỒ CỦA TÔI</h1>
+
+    <div th:if="${inventoryList.isEmpty()}" style="text-align: center; color: #ccc;">
+        <h3>Kho trống trơn! 🕸️</h3>
+        <p>Hãy ra trang chủ mở hộp để kiếm đồ nhé.</p>
+        <a href="/" class="btn-buy" style="display:inline-block; width:200px; margin-top:20px;">Về trang chủ</a>
+    </div>
+
+    <div class="box-grid">
+        <div class="box-card" th:each="item : ${inventoryList}" th:id="'card-' + ${item.inventoryId}">
+            <div class="rank-badge" th:text="${item.boxItem.rarityLevel}"
+                 th:classappend="'rank-' + ${item.boxItem.rarityLevel}"></div>
+
+            <div class="box-image">
+                <img th:src="${item.boxItem.imageUrl}" alt="Item Image">
+            </div>
+            <div class="box-info">
+                <h3 th:text="${item.boxItem.itemName}">Tên Món</h3>
+
+                <p style="font-size:14px; color:#aaa;">Giá trị:
+                    <span th:text="${#numbers.formatDecimal(item.boxItem.marketValue, 0, 'COMMA', 0, 'POINT')}">0</span> đ
+                </p>
+
+                <button class="btn-sell" th:onclick="'sellItem(' + ${item.inventoryId} + ')'">
+                    💸 Bán lại (Nhận 90%)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function sellItem(inventoryId) {
+        const userId = [[${user.userId}]];
+
+        Swal.fire({
+            title: 'Bạn chắc chắn muốn bán?',
+            text: "Món này sẽ bị xóa khỏi kho và tiền sẽ về ví!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Bán luôn!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Gọi API Bán hàng
+                fetch(`/api/blindbox/sell?userId=${userId}&inventoryId=${inventoryId}`, {
+                    method: 'POST'
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error("Lỗi bán hàng!");
+                    return response.json();
+                })
+                .then(data => {
+                    // 1. Thông báo thành công
+                    Swal.fire('Đã bán!', data.message, 'success');
+
+                    // 2. Xóa cái thẻ sản phẩm đó khỏi màn hình (Hiệu ứng UI)
+                    document.getElementById('card-' + inventoryId).remove();
+
+                    // 3. Cập nhật số dư trên header
+                    document.getElementById('wallet-balance').innerText = new Intl.NumberFormat().format(data.newBalance);
+                })
+                .catch(error => {
+                    Swal.fire('Lỗi!', 'Không thể bán món này.', 'error');
+                });
+            }
+        })
+    }
+</script>
+
+</body>
+</html>

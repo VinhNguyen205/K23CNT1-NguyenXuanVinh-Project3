@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* CSS cho thẻ thống kê màu mè */
+        .stat-card { border-radius: 10px; color: white; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .bg-gradient-primary { background: linear-gradient(45deg, #4e73df, #224abe); }
+        .bg-gradient-success { background: linear-gradient(45deg, #1cc88a, #13855c); }
+        .bg-gradient-warning { background: linear-gradient(45deg, #f6c23e, #dda20a); }
+
+        /* Avatar tròn cho bảng xếp hạng */
+        .avatar-circle {
+            width: 35px; height: 35px; border-radius: 50%;
+            background: #6c757d; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 14px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1">🛠️ ADMIN QUẢN TRỊ</span>
+        <div class="d-flex align-items-center text-white">
+            <span class="me-3">Xin chào, <b th:text="${user.fullName}">Admin</b></span>
+            <a href="/" class="btn btn-outline-light btn-sm me-2">Về trang chủ</a>
+            <a href="/logout" class="btn btn-danger btn-sm">Đăng xuất</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="stat-card bg-gradient-primary">
+                <h5>👥 Tổng Thành Viên</h5>
+                <h2 th:text="${stats.totalUsers}">0</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-gradient-success">
+                <h5>💰 Tổng Tiền Nạp</h5>
+                <h2 th:text="${#numbers.formatDecimal(stats.totalDeposit, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card bg-gradient-warning">
+                <h5>🛒 Tổng Doanh Thu</h5>
+                <h2 th:text="${#numbers.formatDecimal(stats.totalSpent, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>📦 Danh Sách Hộp Mù</h4>
+                <button class="btn btn-success" onclick="openModal()">
+                    <i class="fas fa-plus"></i> Thêm Hộp Mới
+                </button>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Ảnh</th>
+                            <th>Tên Hộp</th>
+                            <th>Giá tiền</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="box : ${boxes}">
+                            <td th:text="${box.boxId}">1</td>
+                            <td><img th:src="${box.imageUrl}" width="40" class="rounded border"></td>
+                            <td th:text="${box.boxName}" class="fw-bold">Tên hộp</td>
+                            <td th:text="${#numbers.formatDecimal(box.price, 0, 'COMMA', 0, 'POINT')} + ' đ'" class="text-danger fw-bold"></td>
+                            <td>
+                                <span th:if="${box.isActive}" class="badge bg-success">Đang bán</span>
+                                <span th:unless="${box.isActive}" class="badge bg-secondary">Ngừng bán</span>
+                            </td>
+                            <td>
+                                <button class="btn btn-primary btn-sm"
+                                        th:onclick="openModal([[${box.boxId}]], [[${box.boxName}]], [[${box.price}]], [[${box.description}]], [[${box.imageUrl}]])">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <a th:href="@{/admin/delete-box/{id}(id=${box.boxId})}"
+                                   class="btn btn-danger btn-sm" onclick="return confirm('Bạn chắc chắn muốn xóa?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+
+            <div class="card shadow mb-4">
+                <div class="card-header bg-info text-white fw-bold">
+                    <i class="fas fa-hand-holding-usd"></i> Bơm Tiền Nhanh
+                </div>
+                <div class="card-body">
+                    <form action="/admin/add-money" method="post">
+                        <div class="mb-2">
+                            <label class="form-label text-muted small">Chọn thành viên:</label>
+                            <select name="userId" class="form-select" required>
+                                <option value="" disabled selected>-- Chọn User --</option>
+                                <option th:each="u : ${users}" th:value="${u.userId}" th:text="${u.username} + ' - ' + ${u.fullName}"></option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Số tiền (VNĐ):</label>
+                            <input type="number" name="amount" class="form-control" value="500000" step="10000" min="0">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">🚀 Bơm Ngay</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark fw-bold">
+                    <i class="fas fa-trophy"></i> Top Đại Gia (Nạp Nhiều)
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center" th:each="top, iter : ${topUsers}">
+                            <div class="d-flex align-items-center">
+                                <span class="badge me-2"
+                                      th:classappend="${iter.index == 0} ? 'bg-warning' : (${iter.index == 1} ? 'bg-secondary' : (${iter.index == 2} ? 'bg-danger' : 'bg-light text-dark'))"
+                                      th:text="'#' + ${iter.count}">1</span>
+
+                                <div class="avatar-circle me-2" th:text="${#strings.substring(top.user.username,0,1).toUpperCase()}">U</div>
+
+                                <span class="fw-bold small" th:text="${top.user.fullName}">Name</span>
+                            </div>
+                            <span class="text-success fw-bold small" th:text="${#numbers.formatDecimal(top.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+                        </li>
+                    </ul>
+                    <div th:if="${topUsers == null || topUsers.isEmpty()}" class="p-3 text-center text-muted small">
+                        Chưa có dữ liệu nạp tiền.
+                    </div>
+                </div>
+            </div>
+
+        </div> </div> </div>
+
+<div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/admin/save-box" method="post">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalTitle">Thêm Hộp Mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="boxId" name="boxId">
+                    <div class="mb-3">
+                        <label>Tên Hộp</label>
+                        <input type="text" class="form-control" id="boxName" name="boxName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Giá tiền (VNĐ)</label>
+                        <input type="number" class="form-control" id="price" name="price" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Mô tả</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label>Link Ảnh</label>
+                        <input type="text" class="form-control" id="imageUrl" name="imageUrl">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu lại</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Hàm mở modal và điền dữ liệu
+    function openModal(id = '', name = '', price = '', desc = '', img = '') {
+        document.getElementById('boxId').value = id;
+        document.getElementById('boxName').value = name;
+        document.getElementById('price').value = price;
+        document.getElementById('description').value = desc;
+        document.getElementById('imageUrl').value = img;
+        document.getElementById('modalTitle').innerText = id ? "Cập Nhật Hộp" : "Thêm Hộp Mới";
+        new bootstrap.Modal(document.getElementById('productModal')).show();
+    }
+</script>
+
+</body>
+</html>

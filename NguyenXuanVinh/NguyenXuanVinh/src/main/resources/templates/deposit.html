@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nạp Xu</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+    <div class="logo"><a href="/" style="text-decoration:none; color:#ff4757;">🎁 Mystery Box</a></div>
+    <div class="user-info">
+        <a href="/" class="nav-link">Quay lại Shop</a>
+    </div>
+</header>
+
+<div class="container" style="max-width: 500px; margin-top: 50px;">
+    <div class="box-card" style="padding: 30px; text-align: center;">
+        <h2 style="color: #ffd700; margin-bottom: 20px;">💎 NẠP TIỀN VÀO VÍ</h2>
+        <p>Số dư hiện tại: <b th:text="${#numbers.formatDecimal(user.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</b> đ</p>
+
+        <form action="/deposit" method="post" style="margin-top: 30px;">
+            <div style="margin-bottom: 20px; text-align: left;">
+                <label>Chọn mệnh giá:</label>
+                <select name="amount" class="form-control" style="width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px;">
+                    <option value="50000">50.000 VNĐ</option>
+                    <option value="100000">100.000 VNĐ</option>
+                    <option value="200000">200.000 VNĐ</option>
+                    <option value="500000">500.000 VNĐ</option>
+                    <option value="1000000">1.000.000 VNĐ</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-buy" style="width: 100%; font-size: 18px;">💳 THANH TOÁN NGAY</button>
+        </form>
+        <p style="margin-top: 15px; font-size: 12px; color: #aaa;">*Đây là mô phỏng, tiền sẽ vào ví ngay lập tức.</p>
+    </div>
+</div>
+</body>
+</html>

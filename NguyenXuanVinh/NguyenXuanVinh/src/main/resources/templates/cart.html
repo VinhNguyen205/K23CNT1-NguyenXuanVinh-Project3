@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Giỏ Hàng</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<header>
+    <div class="logo"><a href="/" style="text-decoration:none; color:#e94560;">🎁 Mystery Box</a></div>
+    <div class="menu">
+        <a href="/" class="nav-link">🏠 Trang Chủ</a>
+        <a href="/inventory" class="nav-link">🎒 Kho Đồ</a>
+        <a href="/cart" class="nav-link active">🛒 Giỏ Hàng</a>
+        <a href="/admin" class="nav-link admin-btn" th:if="${user != null and user.isAdmin}">🛠️ Quản Trị</a>
+    </div>
+    <div class="user-info" th:if="${user != null}">
+        <span><b th:text="${user.fullName}">User</b></span>
+    </div>
+</header>
+
+<div class="container">
+    <h1 class="title">🛒 GIỎ HÀNG CỦA BẠN</h1>
+
+    <div th:if="${cartItems == null || cartItems.isEmpty()}" style="text-align: center; color: #ccc;">
+        <h3>Giỏ hàng trống!</h3>
+        <a href="/" class="btn-buy" style="display:inline-block; width:200px; margin-top:20px;">Đi mua sắm</a>
+    </div>
+
+    <div th:if="${cartItems != null && !cartItems.isEmpty()}">
+        <table style="width: 100%; border-collapse: collapse; color: #fff; margin-bottom: 20px;">
+            <thead>
+            <tr style="background: #0f3460; text-align: left;">
+                <th style="padding: 15px;">Sản phẩm</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
+                <th>Hành động</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${cartItems}" style="border-bottom: 1px solid #0f3460;">
+                <td style="padding: 15px; display: flex; align-items: center; gap: 15px;">
+                    <img th:src="${item.blindBox.imageUrl}" width="50" style="border-radius: 5px;">
+                    <span th:text="${item.blindBox.boxName}">Tên Hộp</span>
+                </td>
+                <td th:text="${#numbers.formatDecimal(item.blindBox.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                <td th:text="${item.quantity}">1</td>
+                <td style="color: #ffd700; font-weight: bold;"
+                    th:text="${#numbers.formatDecimal(item.blindBox.price * item.quantity, 0, 'COMMA', 0, 'POINT')} + ' đ'"></td>
+                <td>
+                    <button class="btn-sell" style="background: #e74c3c; width: auto; padding: 5px 10px;"
+                            th:onclick="'removeItem(' + ${item.cartItemId} + ')'">Xóa</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div style="text-align: right; margin-top: 30px;">
+            <h2 style="color: #ffd700;">Tổng cộng: <span th:text="${#numbers.formatDecimal(totalAmount, 0, 'COMMA', 0, 'POINT')}">0</span> đ</h2>
+            <button class="btn-buy" style="width: 250px; margin-top: 20px;" onclick="checkout()">💳 THANH TOÁN NGAY</button>        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function removeItem(itemId) {
+        fetch('/api/cart/remove/' + itemId, { method: 'DELETE' })
+        .then(res => {
+            if(res.ok) location.reload();
+            else alert("Lỗi!");
+        });
+    }
+    // Hàm xử lý thanh toán
+    async function checkout() {
+        const userId = [[${user != null ? user.userId : 'null'}]];
+
+        // Kiểm tra giỏ hàng có trống không (Dựa vào UI)
+        // Nếu không có dòng tr nào trong tbody thì là trống
+        if (document.querySelectorAll('tbody tr').length === 0) {
+            Swal.fire('Giỏ hàng trống', 'Vui lòng mua thêm đồ!', 'warning');
+            return;
+        }
+
+        // Hiện Form nhập thông tin giao hàng
+        const { value: formValues } = await Swal.fire({
+            title: 'Thông tin giao hàng',
+            html:
+                '<input id="swal-name" class="swal2-input" placeholder="Họ và tên người nhận">' +
+                '<input id="swal-phone" class="swal2-input" placeholder="Số điện thoại">' +
+                '<input id="swal-address" class="swal2-input" placeholder="Địa chỉ giao hàng">',
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Xác nhận đặt hàng',
+            preConfirm: () => {
+                return {
+                    name: document.getElementById('swal-name').value,
+                    phone: document.getElementById('swal-phone').value,
+                    address: document.getElementById('swal-address').value
+                }
+            }
+        });
+
+        if (formValues) {
+            // Kiểm tra dữ liệu nhập
+            if(!formValues.name || !formValues.phone || !formValues.address) {
+                Swal.fire('Lỗi', 'Vui lòng điền đầy đủ thông tin!', 'error');
+                return;
+            }
+
+            // Gọi API Đặt hàng
+            Swal.fire({ title: 'Đang xử lý...', didOpen: () => Swal.showLoading() });
+
+
+           fetch(`/api/order/checkout?userId=${userId}&name=${encodeURIComponent(formValues.name)}&phone=${encodeURIComponent(formValues.phone)}&address=${encodeURIComponent(formValues.address)}`, {
+           method: 'POST'
+})
+            .then(res => {
+                if(res.ok) {
+                    Swal.fire('Thành công!', 'Đơn hàng của bạn đã được tạo.', 'success')
+                    .then(() => {
+                        window.location.href = '/inventory'; // Chuyển hướng về kho đồ hoặc trang chủ
+                    });
+                } else {
+                    res.text().then(text => Swal.fire('Lỗi', text, 'error'));
+                }
+            })
+            .catch(err => Swal.fire('Lỗi', 'Lỗi kết nối server', 'error'));
+        }
+    }
+</script>
+</body>
+</html>

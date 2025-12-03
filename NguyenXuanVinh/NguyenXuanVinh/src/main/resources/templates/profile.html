@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Hồ Sơ Của Tôi</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .profile-container { display: flex; gap: 30px; margin-top: 30px; }
+        .profile-card, .order-card { background: #16213e; padding: 30px; border-radius: 15px; border: 1px solid #2a2a40; }
+        .profile-card { flex: 1; height: fit-content; }
+        .order-card { flex: 2; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; color: #aaa; margin-bottom: 5px; }
+        .form-control { width: 100%; padding: 10px; background: #0f3460; border: 1px solid #2a2a40; color: #fff; border-radius: 5px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: #888; padding: 10px; border-bottom: 1px solid #2a2a40; }
+        td { padding: 15px 10px; border-bottom: 1px solid #2a2a40; }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .status-COMPLETED { background: #2ecc71; color: #000; }
+        .status-PENDING { background: #f1c40f; color: #000; }
+        .status-CANCELLED { background: #e74c3c; color: #fff; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><a href="/" style="text-decoration:none; color:#ff4757;">🎁 Mystery Box</a></div>
+    <div class="menu">
+        <a href="/" class="nav-link">🏠 Trang Chủ</a>
+        <a href="/cart" class="nav-link">🛒 Giỏ Hàng</a>
+        <a href="/inventory" class="nav-link">🎒 Kho Đồ</a>
+    </div>
+    <div class="user-info">
+        <span>Xin chào, <b th:text="${user.fullName}">User</b></span>
+        <a href="/logout" class="logout-link" style="margin-left:15px;">Đăng xuất</a>
+    </div>
+</header>
+
+<div class="container">
+    <div class="profile-container">
+
+        <div class="profile-card">
+            <h2 style="color: #ffd700; margin-bottom: 20px;">👤 Thông Tin Cá Nhân</h2>
+            <form id="profileForm">
+                <input type="hidden" id="userId" th:value="${user.userId}">
+                <div class="form-group">
+                    <label>Tên đăng nhập (Không thể đổi)</label>
+                    <input type="text" class="form-control" th:value="${user.username}" disabled style="opacity: 0.5;">
+                </div>
+                <div class="form-group">
+                    <label>Họ và tên</label>
+                    <input type="text" id="fullName" class="form-control" th:value="${user.fullName}">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" class="form-control" th:value="${user.email}">
+                </div>
+                <div class="form-group">
+                    <label>Số điện thoại</label>
+                    <input type="text" id="phone" class="form-control" placeholder="Cập nhật sau...">
+                </div>
+                <div class="form-group">
+                    <label>Địa chỉ mặc định</label>
+                    <input type="text" id="address" class="form-control" placeholder="Cập nhật sau...">
+                </div>
+
+                <button type="button" class="btn-buy" onclick="updateProfile()" style="width: 100%;">LƯU THAY ĐỔI</button>
+            </form>
+        </div>
+
+        <div class="order-card">
+            <h2 style="color: #3498db; margin-bottom: 20px;">📦 Lịch Sử Đơn Hàng</h2>
+
+            <div th:if="${orders.isEmpty()}" style="text-align: center; color: #666; margin-top: 50px;">
+                <p>Bạn chưa mua đơn hàng nào.</p>
+            </div>
+
+            <table th:unless="${orders.isEmpty()}">
+                <thead>
+                <tr>
+                    <th>Mã Đơn</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Chi tiết</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${orders}">
+                    <td style="color: #fff; font-weight: bold;" th:text="'#' + ${order.orderId}">#1</td>
+                    <td th:text="${#temporals.format(order.orderDate, 'dd-MM-yyyy HH:mm')}">01-01-2025</td>
+                    <td style="color: #ffd700;" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'">100.000 đ</td>
+                    <td>
+                            <span class="status-badge"
+                                  th:classappend="'status-' + ${order.orderStatus}"
+                                  th:text="${order.orderStatus}">PENDING</span>
+                    </td>
+                    <td>
+                        <button class="btn-sell" style="width: auto; padding: 5px 10px; font-size: 12px; background: #2f3542;">Xem</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function updateProfile() {
+        const userId = document.getElementById('userId').value;
+        const fullName = document.getElementById('fullName').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        const address = document.getElementById('address').value;
+
+        fetch(`/api/user/update`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                userId: userId,
+                fullName: fullName,
+                email: email,
+                phone: phone,
+                address: address
+            })
+        })
+        .then(res => {
+            if (res.ok) Swal.fire('Thành công', 'Đã cập nhật thông tin!', 'success');
+            else Swal.fire('Lỗi', 'Có lỗi xảy ra', 'error');
+        });
+    }
+</script>
+
+</body>
+</html>
