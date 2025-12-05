@@ -4,38 +4,57 @@
     <meta charset="UTF-8">
     <title>Hồ Sơ Của Tôi</title>
     <link rel="stylesheet" href="/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .profile-container { display: flex; gap: 30px; margin-top: 30px; }
-        .profile-card, .order-card { background: #16213e; padding: 30px; border-radius: 15px; border: 1px solid #2a2a40; }
-        .profile-card { flex: 1; height: fit-content; }
-        .order-card { flex: 2; }
+        .profile-container { display: flex; gap: 30px; margin-top: 30px; flex-wrap: wrap; }
+        .profile-card, .nxvOrder-card { background: #1f2833; padding: 30px; border-radius: 15px; border: 1px solid #45a29e; color: #fff; }
+        .profile-card { flex: 1; min-width: 300px; height: fit-content; }
+        .nxvOrder-card { flex: 2; min-width: 400px; }
 
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; color: #aaa; margin-bottom: 5px; }
-        .form-control { width: 100%; padding: 10px; background: #0f3460; border: 1px solid #2a2a40; color: #fff; border-radius: 5px; }
+        .form-group label { display: block; color: #66fcf1; margin-bottom: 8px; font-weight: 600; }
+        .form-control { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 5px; outline: none; transition: 0.3s; }
+        .form-control:focus { box-shadow: 0 0 10px rgba(102, 252, 241, 0.5); border-color: #66fcf1; }
+        .form-control:disabled { background: #14141a; color: #888; border-color: #333; cursor: not-allowed; }
 
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; color: #888; padding: 10px; border-bottom: 1px solid #2a2a40; }
-        td { padding: 15px 10px; border-bottom: 1px solid #2a2a40; }
-        .status-badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-        .status-COMPLETED { background: #2ecc71; color: #000; }
-        .status-PENDING { background: #f1c40f; color: #000; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; color: #45a29e; padding: 15px; border-bottom: 2px solid #45a29e; font-weight: 800; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+        td { padding: 15px; border-bottom: 1px solid #2a2a40; color: #c5c6c7; font-size: 14px; }
+        tr:hover td { background: rgba(102, 252, 241, 0.05); }
+
+        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+        .status-COMPLETED { background: #2ecc71; color: #000; box-shadow: 0 0 10px #2ecc71; }
+        .status-PENDING { background: #f1c40f; color: #000; box-shadow: 0 0 10px #f1c40f; }
         .status-CANCELLED { background: #e74c3c; color: #fff; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo"><a href="/" style="text-decoration:none; color:#ff4757;">🎁 Mystery Box</a></div>
+    <div class="logo">
+        <a href="/" style="text-decoration:none; color:#66fcf1;"><i class="fas fa-gift"></i> Mystery Box</a>
+    </div>
+
     <div class="menu">
         <a href="/" class="nav-link">🏠 Trang Chủ</a>
         <a href="/cart" class="nav-link">🛒 Giỏ Hàng</a>
         <a href="/inventory" class="nav-link">🎒 Kho Đồ</a>
+        <a href="/deposit" class="nav-link deposit-btn">💎 Nạp Xu</a>
+        <a href="/admin" class="nav-link admin-btn" th:if="${nxvUser != null and nxvUser.isAdmin}">🛠️ Quản Trị</a>
     </div>
-    <div class="user-info">
-        <span>Xin chào, <b th:text="${user.fullName}">User</b></span>
-        <a href="/logout" class="logout-link" style="margin-left:15px;">Đăng xuất</a>
+
+    <div class="user-info" th:if="${nxvUser != null}">
+        <div class="user-details">
+            <a href="/profile" style="color: #66fcf1; text-decoration: none; font-weight: 600;">
+                Xin chào, <span th:text="${nxvUser.fullName}">User</span>
+            </a>
+            <br>
+            <a href="/logout" class="logout-link">🚪 Đăng xuất</a>
+        </div>
+        <div class="wallet">
+            💰 <span th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span> VNĐ
+        </div>
     </div>
 </header>
 
@@ -43,39 +62,47 @@
     <div class="profile-container">
 
         <div class="profile-card">
-            <h2 style="color: #ffd700; margin-bottom: 20px;">👤 Thông Tin Cá Nhân</h2>
+            <h2 style="color: #66fcf1; margin-bottom: 20px; border-bottom: 2px solid #2a2a40; padding-bottom: 10px;">
+                <i class="fas fa-user-edit"></i> Thông Tin Cá Nhân
+            </h2>
             <form id="profileForm">
-                <input type="hidden" id="userId" th:value="${user.userId}">
+                <input type="hidden" id="userId" th:value="${nxvUser.userId}">
                 <div class="form-group">
-                    <label>Tên đăng nhập (Không thể đổi)</label>
-                    <input type="text" class="form-control" th:value="${user.username}" disabled style="opacity: 0.5;">
+                    <label>Tên đăng nhập</label>
+                    <input type="text" class="form-control" th:value="${nxvUser.username}" disabled>
                 </div>
                 <div class="form-group">
                     <label>Họ và tên</label>
-                    <input type="text" id="fullName" class="form-control" th:value="${user.fullName}">
+                    <input type="text" id="fullName" class="form-control" th:value="${nxvUser.fullName}">
                 </div>
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" id="email" class="form-control" th:value="${user.email}">
+                    <input type="email" id="email" class="form-control" th:value="${nxvUser.email}">
                 </div>
                 <div class="form-group">
                     <label>Số điện thoại</label>
-                    <input type="text" id="phone" class="form-control" placeholder="Cập nhật sau...">
+                    <input type="text" id="phone" class="form-control" th:value="${nxvUser.phoneNumber != null ? nxvUser.phoneNumber : ''}" placeholder="Nhập SĐT...">
                 </div>
                 <div class="form-group">
-                    <label>Địa chỉ mặc định</label>
-                    <input type="text" id="address" class="form-control" placeholder="Cập nhật sau...">
+                    <label>Địa chỉ giao hàng</label>
+                    <input type="text" id="address" class="form-control" th:value="${nxvUser.address != null ? nxvUser.address : ''}" placeholder="Nhập địa chỉ...">
                 </div>
 
-                <button type="button" class="btn-buy" onclick="updateProfile()" style="width: 100%;">LƯU THAY ĐỔI</button>
+                <button type="button" class="btn-buy" onclick="updateProfile()" style="width: 100%; margin-top: 20px;">
+                    <i class="fas fa-save"></i> LƯU THAY ĐỔI
+                </button>
             </form>
         </div>
 
-        <div class="order-card">
-            <h2 style="color: #3498db; margin-bottom: 20px;">📦 Lịch Sử Đơn Hàng</h2>
+        <div class="nxvOrder-card">
+            <h2 style="color: #66fcf1; margin-bottom: 20px; border-bottom: 2px solid #2a2a40; padding-bottom: 10px;">
+                <i class="fas fa-history"></i> Lịch Sử Đơn Hàng
+            </h2>
 
-            <div th:if="${orders.isEmpty()}" style="text-align: center; color: #666; margin-top: 50px;">
+            <div th:if="${orders.isEmpty()}" style="text-align: center; color: #888; margin-top: 50px;">
+                <i class="fas fa-box-open fa-3x" style="margin-bottom: 20px; color: #2a2a40;"></i>
                 <p>Bạn chưa mua đơn hàng nào.</p>
+                <a href="/" class="btn-buy" style="display:inline-block; width:auto; margin-top:10px; padding:8px 20px;">Mua sắm ngay</a>
             </div>
 
             <table th:unless="${orders.isEmpty()}">
@@ -92,14 +119,16 @@
                 <tr th:each="order : ${orders}">
                     <td style="color: #fff; font-weight: bold;" th:text="'#' + ${order.orderId}">#1</td>
                     <td th:text="${#temporals.format(order.orderDate, 'dd-MM-yyyy HH:mm')}">01-01-2025</td>
-                    <td style="color: #ffd700;" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'">100.000 đ</td>
+                    <td style="color: #ffd700; font-weight: bold;" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'">100.000 đ</td>
                     <td>
-                            <span class="status-badge"
-                                  th:classappend="'status-' + ${order.orderStatus}"
-                                  th:text="${order.orderStatus}">PENDING</span>
+                        <span class="status-badge"
+                              th:classappend="'status-' + ${order.orderStatus}"
+                              th:text="${order.orderStatus}">PENDING</span>
                     </td>
                     <td>
-                        <button class="btn-sell" style="width: auto; padding: 5px 10px; font-size: 12px; background: #2f3542;">Xem</button>
+                        <button class="btn-sell" style="width: auto; padding: 5px 12px; font-size: 11px; background: #2f3542; border: 1px solid #45a29e; color: #45a29e;">
+                            <i class="fas fa-eye"></i>
+                        </button>
                     </td>
                 </tr>
                 </tbody>
@@ -118,6 +147,7 @@
         const phone = document.getElementById('phone').value;
         const address = document.getElementById('address').value;
 
+        // Sửa URL API cho đúng: /api/user/update
         fetch(`/api/user/update`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -129,10 +159,20 @@
                 address: address
             })
         })
-        .then(res => {
-            if (res.ok) Swal.fire('Thành công', 'Đã cập nhật thông tin!', 'success');
-            else Swal.fire('Lỗi', 'Có lỗi xảy ra', 'error');
-        });
+        .then(async response => {
+            if (response.ok) {
+                const text = await response.text(); // Đọc phản hồi text từ API
+                Swal.fire({
+                    title: 'Thành công',
+                    text: text, // "Cập nhật thành công!"
+                    icon: 'success',
+                    background: '#1f2833', color: '#fff'
+                }).then(() => location.reload());
+            } else {
+                Swal.fire('Lỗi', 'Có lỗi xảy ra', 'error');
+            }
+        })
+        .catch(() => Swal.fire('Lỗi', 'Lỗi kết nối server', 'error'));
     }
 </script>
 

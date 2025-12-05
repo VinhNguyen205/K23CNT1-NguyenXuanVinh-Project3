@@ -5,20 +5,133 @@
     <title>Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        /* CSS cho thẻ thống kê màu mè */
-        .stat-card { border-radius: 10px; color: white; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.3s; }
-        .stat-card:hover { transform: translateY(-5px); }
-        .bg-gradient-primary { background: linear-gradient(45deg, #4e73df, #224abe); }
-        .bg-gradient-success { background: linear-gradient(45deg, #1cc88a, #13855c); }
-        .bg-gradient-warning { background: linear-gradient(45deg, #f6c23e, #dda20a); }
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 
-        /* Avatar tròn cho bảng xếp hạng */
+    <style>
+        /* --- GLOBAL & THEME CONFIG --- */
+        body.bg-light {
+            background-color: #0b0c10 !important; /* Nền đen chủ đạo */
+            color: #c5c6c7;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            background-color: rgba(31, 40, 51, 0.95) !important;
+            border-bottom: 2px solid #45a29e;
+            box-shadow: 0 4px 15px rgba(102, 252, 241, 0.1);
+        }
+        .navbar-brand {
+            color: #66fcf1 !important;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .btn-outline-light { color: #66fcf1; border-color: #66fcf1; }
+        .btn-outline-light:hover { background: #66fcf1; color: #000; }
+
+        /* --- CARDS --- */
+        .card {
+            background-color: #1f2833;
+            border: 1px solid #45a29e;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .card-header {
+            background-color: #0b0c10 !important;
+            border-bottom: 1px solid #45a29e;
+            color: #66fcf1 !important;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .list-group-item {
+            background-color: #1f2833;
+            border-bottom: 1px solid #2a2a40;
+            color: #fff;
+        }
+
+        /* --- STATS CARDS (Thẻ thống kê) --- */
+        .stat-card {
+            border-radius: 15px;
+            color: white;
+            padding: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(102, 252, 241, 0.2); }
+
+        /* Màu Gradient Neon */
+        .bg-gradient-primary { background: linear-gradient(135deg, #1e3c72, #2a5298); border: 1px solid #66fcf1; }
+        .bg-gradient-success { background: linear-gradient(135deg, #11998e, #38ef7d); border: 1px solid #2ecc71; }
+        .bg-gradient-warning { background: linear-gradient(135deg, #f2994a, #f2c94c); border: 1px solid #f1c40f; color: #000; }
+
+        .stat-card h2 { font-weight: 800; margin-top: 10px; font-size: 28px; text-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .stat-card h5 { font-size: 14px; text-transform: uppercase; opacity: 0.8; font-weight: 600; }
+
+        /* --- TABLE (Bảng dữ liệu) --- */
+        .table { color: #c5c6c7 !important; border-color: #45a29e; --bs-table-bg: transparent; }
+        .table-dark {
+            background-color: #0b0c10 !important;
+            color: #66fcf1;
+            border-bottom: 2px solid #45a29e;
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(102, 252, 241, 0.1) !important;
+            color: #fff;
+        }
+        .table td, .table th { border-color: #2a2a40; vertical-align: middle; padding: 12px; }
+        .badge { font-weight: 600; padding: 6px 10px; }
+
+        /* --- FORM INPUTS (Fix lỗi chữ trắng nền trắng) --- */
+        .form-control, .form-select {
+            background-color: #0b0c10 !important;
+            border: 1px solid #45a29e;
+            color: #fff !important;
+            padding: 10px;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #1f2833 !important;
+            border-color: #66fcf1;
+            box-shadow: 0 0 10px rgba(102, 252, 241, 0.3);
+            color: #fff !important;
+        }
+        /* Quan trọng: Màu nền option dropdown */
+        option { background-color: #0b0c10; color: #fff; padding: 10px; }
+
+        /* --- MODAL (Popup) --- */
+        .modal-content {
+            background-color: #1f2833;
+            border: 1px solid #66fcf1;
+            box-shadow: 0 0 40px rgba(102, 252, 241, 0.2);
+            color: #fff;
+        }
+        .modal-header { border-bottom: 1px solid #45a29e; background: #0b0c10; }
+        .modal-footer { border-top: 1px solid #45a29e; background: #0b0c10; }
+        .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+
+        /* --- BUTTONS --- */
+        .btn-primary {
+            background-color: #45a29e; border-color: #45a29e; color: #0b0c10; font-weight: bold;
+        }
+        .btn-primary:hover {
+            background-color: #66fcf1; border-color: #66fcf1; box-shadow: 0 0 15px #66fcf1; color: #000;
+        }
+        .btn-success { background-color: #2ecc71; border: none; font-weight: bold; color: #000; }
+        .btn-success:hover { background-color: #27ae60; box-shadow: 0 0 15px #2ecc71; }
+
+        .btn-danger { background-color: #ff4757; border: none; font-weight: bold; }
+        .btn-danger:hover { background-color: #ff6b81; box-shadow: 0 0 15px #ff4757; }
+
+        /* --- AVATAR --- */
         .avatar-circle {
             width: 35px; height: 35px; border-radius: 50%;
-            background: #6c757d; color: #fff;
+            background: #45a29e; color: #0b0c10;
             display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 14px;
+            font-weight: 800; font-size: 14px;
+            border: 2px solid #66fcf1;
         }
     </style>
 </head>
@@ -26,11 +139,11 @@
 
 <nav class="navbar navbar-dark bg-dark mb-4">
     <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1">🛠️ ADMIN QUẢN TRỊ</span>
+        <span class="navbar-brand mb-0 h1"><i class="fas fa-tools"></i> ADMIN QUẢN TRỊ</span>
         <div class="d-flex align-items-center text-white">
-            <span class="me-3">Xin chào, <b th:text="${user.fullName}">Admin</b></span>
-            <a href="/" class="btn btn-outline-light btn-sm me-2">Về trang chủ</a>
-            <a href="/logout" class="btn btn-danger btn-sm">Đăng xuất</a>
+            <span class="me-3">Xin chào, <b th:text="${nxvUser.fullName}" style="color: #66fcf1;">Admin</b></span>
+            <a href="/" class="btn btn-outline-light btn-sm me-2"><i class="fas fa-home"></i> Trang chủ</a>
+            <a href="/logout" class="btn btn-danger btn-sm"><i class="fas fa-sign-out-alt"></i> Thoát</a>
         </div>
     </div>
 </nav>
@@ -40,31 +153,30 @@
     <div class="row mb-4">
         <div class="col-md-4">
             <div class="stat-card bg-gradient-primary">
-                <h5>👥 Tổng Thành Viên</h5>
+                <h5><i class="fas fa-users"></i> Tổng Thành Viên</h5>
                 <h2 th:text="${stats.totalUsers}">0</h2>
             </div>
         </div>
         <div class="col-md-4">
             <div class="stat-card bg-gradient-success">
-                <h5>💰 Tổng Tiền Nạp</h5>
+                <h5><i class="fas fa-wallet"></i> Tổng Tiền Nạp</h5>
                 <h2 th:text="${#numbers.formatDecimal(stats.totalDeposit, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</h2>
             </div>
         </div>
         <div class="col-md-4">
             <div class="stat-card bg-gradient-warning">
-                <h5>🛒 Tổng Doanh Thu</h5>
+                <h5><i class="fas fa-shopping-cart"></i> Tổng Doanh Thu</h5>
                 <h2 th:text="${#numbers.formatDecimal(stats.totalSpent, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</h2>
             </div>
         </div>
     </div>
 
     <div class="row">
-
         <div class="col-lg-8">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4>📦 Danh Sách Hộp Mù</h4>
+                <h4 style="color: #66fcf1; font-weight: 800;">📦 DANH SÁCH HỘP MÙ</h4>
                 <button class="btn btn-success" onclick="openModal()">
-                    <i class="fas fa-plus"></i> Thêm Hộp Mới
+                    <i class="fas fa-plus-circle"></i> Thêm Mới
                 </button>
             </div>
 
@@ -83,10 +195,10 @@
                         </thead>
                         <tbody>
                         <tr th:each="box : ${boxes}">
-                            <td th:text="${box.boxId}">1</td>
-                            <td><img th:src="${box.imageUrl}" width="40" class="rounded border"></td>
-                            <td th:text="${box.boxName}" class="fw-bold">Tên hộp</td>
-                            <td th:text="${#numbers.formatDecimal(box.price, 0, 'COMMA', 0, 'POINT')} + ' đ'" class="text-danger fw-bold"></td>
+                            <td th:text="${box.boxId}" style="font-weight: bold;">1</td>
+                            <td><img th:src="${box.imageUrl}" width="45" class="rounded border border-secondary"></td>
+                            <td th:text="${box.boxName}" class="fw-bold text-white">Tên hộp</td>
+                            <td th:text="${#numbers.formatDecimal(box.price, 0, 'COMMA', 0, 'POINT')} + ' đ'" style="color: #f1c40f; font-weight: bold;"></td>
                             <td>
                                 <span th:if="${box.isActive}" class="badge bg-success">Đang bán</span>
                                 <span th:unless="${box.isActive}" class="badge bg-secondary">Ngừng bán</span>
@@ -111,16 +223,18 @@
         <div class="col-lg-4">
 
             <div class="card shadow mb-4">
-                <div class="card-header bg-info text-white fw-bold">
+                <div class="card-header">
                     <i class="fas fa-hand-holding-usd"></i> Bơm Tiền Nhanh
                 </div>
                 <div class="card-body">
                     <form action="/admin/add-money" method="post">
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label class="form-label text-muted small">Chọn thành viên:</label>
                             <select name="userId" class="form-select" required>
                                 <option value="" disabled selected>-- Chọn User --</option>
-                                <option th:each="u : ${users}" th:value="${u.userId}" th:text="${u.username} + ' - ' + ${u.fullName}"></option>
+                                <option th:each="u : ${users}"
+                                        th:value="${u.userId}"
+                                        th:text="${u.username} + ' - ' + ${u.fullName}"></option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -133,62 +247,48 @@
             </div>
 
             <div class="card shadow">
-                <div class="card-header bg-warning text-dark fw-bold">
-                    <i class="fas fa-trophy"></i> Top Đại Gia (Nạp Nhiều)
+                <div class="card-header" style="color: #f1c40f !important;">
+                    <i class="fas fa-trophy"></i> Top Đại Gia
                 </div>
                 <div class="card-body p-0">
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-center" th:each="top, iter : ${topUsers}">
                             <div class="d-flex align-items-center">
                                 <span class="badge me-2"
-                                      th:classappend="${iter.index == 0} ? 'bg-warning' : (${iter.index == 1} ? 'bg-secondary' : (${iter.index == 2} ? 'bg-danger' : 'bg-light text-dark'))"
+                                      th:classappend="${iter.index == 0} ? 'bg-warning text-dark' : 'bg-secondary'"
                                       th:text="'#' + ${iter.count}">1</span>
-
                                 <div class="avatar-circle me-2" th:text="${#strings.substring(top.user.username,0,1).toUpperCase()}">U</div>
-
                                 <span class="fw-bold small" th:text="${top.user.fullName}">Name</span>
                             </div>
-                            <span class="text-success fw-bold small" th:text="${#numbers.formatDecimal(top.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+                            <span class="fw-bold small" style="color: #2ecc71;"
+                                  th:text="${#numbers.formatDecimal(top.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
                         </li>
                     </ul>
-                    <div th:if="${topUsers == null || topUsers.isEmpty()}" class="p-3 text-center text-muted small">
-                        Chưa có dữ liệu nạp tiền.
-                    </div>
                 </div>
             </div>
 
-        </div> </div> </div>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" id="productModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <form action="/admin/save-box" method="post">
-                <div class="modal-header bg-primary text-white">
+                <div class="modal-header">
                     <h5 class="modal-title" id="modalTitle">Thêm Hộp Mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="boxId" name="boxId">
-                    <div class="mb-3">
-                        <label>Tên Hộp</label>
-                        <input type="text" class="form-control" id="boxName" name="boxName" required>
-                    </div>
-                    <div class="mb-3">
-                        <label>Giá tiền (VNĐ)</label>
-                        <input type="number" class="form-control" id="price" name="price" required>
-                    </div>
-                    <div class="mb-3">
-                        <label>Mô tả</label>
-                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label>Link Ảnh</label>
-                        <input type="text" class="form-control" id="imageUrl" name="imageUrl">
-                    </div>
+                    <div class="mb-3"><label>Tên Hộp</label><input type="text" class="form-control" id="boxName" name="boxName" required></div>
+                    <div class="mb-3"><label>Giá tiền</label><input type="number" class="form-control" id="price" name="price" required></div>
+                    <div class="mb-3"><label>Mô tả</label><textarea class="form-control" id="description" name="description"></textarea></div>
+                    <div class="mb-3"><label>Link Ảnh</label><input type="text" class="form-control" id="imageUrl" name="imageUrl" placeholder="/images/..."></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Lưu lại</button>
+                    <button type="submit" class="btn btn-primary">Lưu Lại</button>
                 </div>
             </form>
         </div>
@@ -197,7 +297,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Hàm mở modal và điền dữ liệu
     function openModal(id = '', name = '', price = '', desc = '', img = '') {
         document.getElementById('boxId').value = id;
         document.getElementById('boxName').value = name;

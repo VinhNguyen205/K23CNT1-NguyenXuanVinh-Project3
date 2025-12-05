@@ -9,7 +9,7 @@
 <body>
 <header>
     <div class="logo"><a href="/" style="text-decoration:none; color:#ff4757;">🎁 Mystery Box</a></div>
-    <div class="user-info">
+    <div class="nxvUser-info">
         <a href="/" class="nav-link">Quay lại Shop</a>
     </div>
 </header>
@@ -17,7 +17,7 @@
 <div class="container" style="max-width: 500px; margin-top: 50px;">
     <div class="box-card" style="padding: 30px; text-align: center;">
         <h2 style="color: #ffd700; margin-bottom: 20px;">💎 NẠP TIỀN VÀO VÍ</h2>
-        <p>Số dư hiện tại: <b th:text="${#numbers.formatDecimal(user.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</b> đ</p>
+        <p>Số dư hiện tại: <b th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</b> đ</p>
 
         <form action="/deposit" method="post" style="margin-top: 30px;">
             <div style="margin-bottom: 20px; text-align: left;">

@@ -4,20 +4,40 @@
     <meta charset="UTF-8">
     <title th:text="${box.boxName}">Chi tiết hộp</title>
     <link rel="stylesheet" href="/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
 <header>
-    <div class="logo"><a href="/" style="text-decoration:none; color:#ff4757;"><i class="fas fa-gift"></i> Mystery Box</a></div>
+    <div class="logo">
+        <a href="/" style="text-decoration:none; color:#66fcf1;"><i class="fas fa-gift"></i> Mystery Box</a>
+    </div>
+
     <div class="menu">
         <a href="/" class="nav-link">🏠 Trang Chủ</a>
         <a href="/cart" class="nav-link">🛒 Giỏ Hàng</a>
         <a href="/inventory" class="nav-link">🎒 Kho Đồ</a>
+        <a href="/deposit" class="nav-link deposit-btn">💎 Nạp Xu</a>
+
+        <a href="/admin" class="nav-link admin-btn" th:if="${nxvUser != null and nxvUser.isAdmin}">🛠️ Quản Trị</a>
     </div>
-    <div class="user-info" th:if="${user != null}">
-        <div class="wallet">💰 <span th:text="${#numbers.formatDecimal(user.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span> đ</div>
+
+    <div class="user-info" th:if="${nxvUser != null}">
+        <div class="user-details">
+            <a href="/profile" style="color: #fff; text-decoration: none; font-weight: 600;">
+                Xin chào, <span th:text="${nxvUser.fullName}" style="color: #66fcf1;">User</span>
+            </a>
+            <br>
+            <a href="/logout" class="logout-link">🚪 Đăng xuất</a>
+        </div>
+        <div class="wallet">
+            💰 <span th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span> VNĐ
+        </div>
+    </div>
+
+    <div class="user-info" th:if="${nxvUser == null}">
+        <a href="/login" class="btn-buy" style="padding: 8px 20px; text-decoration: none; width: auto; margin: 0;">Đăng Nhập</a>
     </div>
 </header>
 
@@ -33,8 +53,8 @@
             <p class="desc" th:text="${box.description}">Mô tả...</p>
 
             <div class="action-buttons vertical">
-                <button class="btn-buy big-btn" th:onclick="'openBox(' + ${box.boxId} + ')'">🔥 MỞ NGAY (1 LẦN)</button>
-                <button class="btn-cart big-btn" th:onclick="'addToCart(' + ${box.boxId} + ')'">🛒 THÊM VÀO GIỎ</button>
+                <button class="btn-buy big-btn" th:onclick="'openBox(' + ${box.boxId} + ')'"><i class="fas fa-magic"></i> MỞ NGAY (1 LẦN)</button>
+                <button class="btn-cart big-btn" th:onclick="'addToCart(' + ${box.boxId} + ')'"><i class="fas fa-cart-plus"></i> THÊM VÀO GIỎ</button>
             </div>
         </div>
     </div>
@@ -48,9 +68,7 @@
             <img th:src="${item.imageUrl}" alt="Item">
             <p class="item-name" th:text="${item.itemName}">Tên món</p>
             <p class="drop-rate"
-   th:text="'Tỉ lệ: ' + ${#numbers.formatDecimal(item.probability * 100, 1, 2)} + '%'">
-   3.33%
-</p>
+               th:text="'Tỉ lệ: ' + ${#numbers.formatDecimal(item.probability * 100, 1, 2)} + '%'">1%</p>
         </div>
     </div>
 
@@ -58,35 +76,80 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script th:inline="javascript">
-    // Bạn copy nguyên si 3 hàm: openBox, addToCart, showResult từ index.html dán vào đây nhé!
-    // (Hoặc nếu lười thì bảo mình gửi lại full script cho)
-
-    // --- CHỖ NÀY DÁN SCRIPT VÀO ---
-    function promptLogin() { Swal.fire('Lỗi', 'Vui lòng đăng nhập!', 'warning').then(()=>window.location.href='/login'); }
+    function promptLogin() {
+        Swal.fire({
+            title: 'Chưa đăng nhập!',
+            text: 'Vui lòng đăng nhập để tiếp tục.',
+            icon: 'warning',
+            confirmButtonText: 'Đăng nhập ngay'
+        }).then((res) => {
+            if(res.isConfirmed) window.location.href='/login';
+        });
+    }
 
     function openBox(boxId) {
-        const userId = [[${user != null ? user.userId : 'null'}]];
-        if(userId=='null') { promptLogin(); return; }
-        Swal.fire({title:'Đang mở...', didOpen:()=>{Swal.showLoading()}});
-        fetch(`/api/blindbox/open?userId=${userId}&boxId=${boxId}`, {method:'POST'})
-        .then(res=>res.json()).then(data=>showResult(data)).catch(()=>Swal.fire('Lỗi','Tiền không đủ','error'));
+        const userId = [[${nxvUser != null ? nxvUser.userId : 'null'}]];
+        if (userId === 'null' || userId === null) { promptLogin(); return; }
+
+        Swal.fire({
+            title: 'Đang mở hộp...',
+            html: 'Chờ xíu nhé, đang cầu nguyện nhân phẩm! 🙏',
+            timerProgressBar: true,
+            didOpen: () => { Swal.showLoading() }
+        });
+
+        // Đã sửa lỗi: dùng biến userId (thay vì nxvUserId)
+        fetch(`/api/blindbox/open?userId=${userId}&boxId=${boxId}`, { method: 'POST' })
+        .then(res => {
+            if (!res.ok) throw new Error("Tiền không đủ hoặc lỗi mạng");
+            return res.json();
+        })
+        .then(data => showResult(data))
+        .catch(() => Swal.fire('Lỗi!', 'Bạn không đủ tiền hoặc có lỗi xảy ra.', 'error'));
     }
 
     function addToCart(boxId) {
-        const userId = [[${user != null ? user.userId : 'null'}]];
-        if(userId=='null') { promptLogin(); return; }
-        fetch(`/api/cart/add?userId=${userId}&boxId=${boxId}`, {method:'POST'}).then(res=>{
-            if(res.ok) Swal.fire({toast:true, position:'top-end', icon:'success', title:'Đã thêm vào giỏ!', showConfirmButton:false, timer:1500});
+        const userId = [[${nxvUser != null ? nxvUser.userId : 'null'}]];
+        if (userId === 'null' || userId === null) { promptLogin(); return; }
+
+        // Đã sửa lỗi: dùng biến userId (thay vì nxvUserId)
+        // Lưu ý: API giỏ hàng endpoint là /api/cart/add (chứ không phải nxvCart)
+        fetch(`/api/cart/add?userId=${userId}&boxId=${boxId}`, { method: 'POST' })
+        .then(res => {
+            if(res.ok) {
+                const Toast = Swal.mixin({
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 2000,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer);
+                        toast.addEventListener('mouseleave', Swal.resumeTimer);
+                    }
+                })
+                Toast.fire({ icon: 'success', title: 'Đã thêm vào giỏ!' })
+            } else {
+                Swal.fire('Lỗi', 'Không thể thêm vào giỏ', 'error');
+            }
         });
     }
 
     function showResult(data) {
-        let color = data.rarity == 'S' ? '#ffd700' : (data.rarity == 'A' ? '#c92a2a' : '#fff');
+        let titleColor = '#000';
+        if(data.rarity === 'S') titleColor = '#ffd700';
+        else if(data.rarity === 'A') titleColor = '#ff4757';
+        else if(data.rarity === 'B') titleColor = '#9b59b6';
+        else if(data.rarity === 'C') titleColor = '#3498db';
+
         Swal.fire({
-            title: `<span style="color:${color}">BẠN TRÚNG: ${data.rarity}</span>`,
-            html: `<img src="${data.itemImage}" style="width:150px"><br><h3>${data.itemName}</h3>`,
-            confirmButtonText: 'OK'
-        }).then(()=>location.reload());
+            title: `<span style="color:${titleColor}">🎉 BẠN TRÚNG: ${data.rarity} 🎉</span>`,
+            html: `
+                <div style="text-align:center">
+                    <img src="${data.itemImage}" style="width:150px; margin:10px auto; border-radius:10px; box-shadow:0 0 15px ${titleColor}">
+                    <h3>${data.itemName}</h3>
+                    <p>Số dư còn lại: <b>${new Intl.NumberFormat().format(data.currentBalance)} đ</b></p>
+                </div>
+            `,
+            confirmButtonText: 'Tuyệt vời!',
+            background: '#fff url(/images/confetti.gif)'
+        }).then(() => location.reload());
     }
 </script>
 

@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <title>Blind Box Shop - Gacha Game</title>
     <link rel="stylesheet" href="/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
 <header>
     <div class="logo">
-        <a href="/" style="text-decoration:none; color:#ff4757;"><i class="fas fa-gift"></i> Mystery Box</a>
+        <a href="/" style="text-decoration:none; color:#66fcf1;"><i class="fas fa-gift"></i> Mystery Box</a>
     </div>
 
     <div class="search-bar">
@@ -26,24 +26,27 @@
         <a href="/cart" class="nav-link">🛒 Giỏ Hàng</a>
         <a href="/inventory" class="nav-link">🎒 Kho Đồ</a>
         <a href="/deposit" class="nav-link deposit-btn">💎 Nạp Xu</a>
-        <a href="/admin" class="nav-link admin-btn" th:if="${user != null and user.isAdmin}">🛠️ Quản Trị</a>
+
+        <a href="/admin" class="nav-link"
+           style="border: 1px solid #ff4757; color: #ff4757;"
+           th:if="${nxvUser != null and nxvUser.isAdmin}">🛠️ Quản Trị</a>
     </div>
 
-    <div class="user-info" th:if="${user != null}">
+    <div class="user-info" th:if="${nxvUser != null}">
         <div class="user-details">
             <a href="/profile" style="color: #fff; text-decoration: none; font-weight: 600;">
-                Xin chào, <span th:text="${user.fullName}">User</span>
+                Xin chào, <span th:text="${nxvUser.fullName}" style="color: #66fcf1;">User</span>
             </a>
             <br>
             <a href="/logout" class="logout-link">🚪 Đăng xuất</a>
         </div>
         <div class="wallet">
-            💰 <span th:text="${#numbers.formatDecimal(user.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span> VNĐ
+            💰 <span th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span> VNĐ
         </div>
     </div>
 
-    <div class="user-info" th:if="${user == null}">
-        <a href="/login" class="btn-buy" style="padding: 8px 20px; text-decoration: none;">Đăng Nhập</a>
+    <div class="user-info" th:if="${nxvUser == null}">
+        <a href="/login" class="btn-buy" style="padding: 8px 20px; text-decoration: none; width: auto; margin: 0;">Đăng Nhập</a>
     </div>
 </header>
 
@@ -57,16 +60,18 @@
 
 <div class="container" id="shop-section">
     <h2 class="section-title">🔥 HỘP MÙ ĐANG HOT 🔥</h2>
+
     <div th:if="${boxes.isEmpty()}" style="text-align: center; margin-top: 50px; color: #888;">
         <h2>🔍 Không tìm thấy sản phẩm nào!</h2>
         <p>Thử tìm từ khóa khác xem sao...</p>
-        <a href="/" class="btn-buy" style="margin-top: 20px; display: inline-block;">Về xem tất cả</a>
+        <a href="/" class="btn-buy" style="margin-top: 20px; display: inline-block; width: auto; padding: 10px 30px;">Về xem tất cả</a>
     </div>
+
     <div class="box-grid">
         <div class="box-card" th:each="box : ${boxes}">
             <div class="box-image">
                 <a th:href="@{/box/{id}(id=${box.boxId})}">
-                    <img th:src="${box.imageUrl}" alt="Box Image">
+                    <img th:src="${box.imageUrl != null ? box.imageUrl : 'https://placehold.co/400'}" alt="Box Image">
                 </a>
                 <span class="hot-badge">HOT</span>
             </div>
@@ -75,8 +80,7 @@
                     <h3 th:text="${box.boxName}">Tên Hộp</h3>
                 </a>
 
-                <p class="desc" th:text="${box.description}">Mô tả ngắn...</p>
-                <div class="price-tag" th:text="${#numbers.formatDecimal(box.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">100.000 đ</div>
+                <p class="price-tag" th:text="${#numbers.formatDecimal(box.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">100.000 đ</p>
 
                 <div class="action-buttons">
                     <button class="btn-buy" th:onclick="'openBox(' + ${box.boxId} + ')'"><i class="fas fa-magic"></i> MỞ NGAY</button>
@@ -87,7 +91,7 @@
     </div>
 </div>
 
-<footer style="text-align: center; padding: 20px; color: #666; margin-top: 50px;">
+<footer style="text-align: center; padding: 30px; color: #666; margin-top: 50px; border-top: 1px solid #1f2833;">
     <p>&copy; 2025 Mystery Box Shop. Design by Nguyen Xuan Vinh.</p>
 </footer>
 
@@ -97,9 +101,15 @@
         document.getElementById('shop-section').scrollIntoView({behavior: 'smooth'});
     }
 
+    // --- HÀM MỞ HỘP (GACHA) ---
     function openBox(boxId) {
-        const userId = [[${user != null ? user.userId : 'null'}]];
-        if (userId === 'null') { promptLogin(); return; }
+        // Lấy ID từ nxvUser (Lưu ý dùng đúng tên biến)
+        const userId = [[${nxvUser != null ? nxvUser.userId : 'null'}]];
+
+        if (userId === 'null' || userId === null) {
+            promptLogin();
+            return;
+        }
 
         Swal.fire({
             title: 'Đang mở hộp...',
@@ -117,16 +127,17 @@
         .catch(() => Swal.fire('Lỗi!', 'Bạn không đủ tiền hoặc có lỗi xảy ra.', 'error'));
     }
 
+    // --- HÀM THÊM GIỎ HÀNG ---
     function addToCart(boxId) {
-        const userId = [[${user != null ? user.userId : 'null'}]];
-        if (userId === 'null') { promptLogin(); return; }
+        const userId = [[${nxvUser != null ? nxvUser.userId : 'null'}]];
+        if (userId === 'null' || userId === null) { promptLogin(); return; }
 
         fetch(`/api/cart/add?userId=${userId}&boxId=${boxId}`, { method: 'POST' })
         .then(res => {
             if(res.ok) {
                 const Toast = Swal.mixin({
                     toast: true, position: 'top-end', showConfirmButton: false, timer: 2000,
-                    didOpen: (toast) => { 
+                    didOpen: (toast) => {
                         toast.addEventListener('mouseenter', Swal.stopTimer);
                         toast.addEventListener('mouseleave', Swal.resumeTimer);
                     }
@@ -138,10 +149,11 @@
         });
     }
 
+    // --- HIỂN THỊ KẾT QUẢ ---
     function showResult(data) {
         let titleColor = '#000';
         if(data.rarity === 'S') titleColor = '#ffd700';
-        else if(data.rarity === 'A') titleColor = '#c92a2a';
+        else if(data.rarity === 'A') titleColor = '#ff4757';
         else if(data.rarity === 'B') titleColor = '#9b59b6';
         else if(data.rarity === 'C') titleColor = '#3498db';
 
@@ -160,14 +172,14 @@
     }
 
     function promptLogin() {
-        Swal.fire({ 
-            title: 'Chưa đăng nhập!', 
-            text: 'Vui lòng đăng nhập để tiếp tục.', 
-            icon: 'warning', 
-            confirmButtonText: 'Đăng nhập ngay' 
+        Swal.fire({
+            title: 'Chưa đăng nhập!',
+            text: 'Vui lòng đăng nhập để tiếp tục.',
+            icon: 'warning',
+            confirmButtonText: 'Đăng nhập ngay'
         })
-        .then((res) => { 
-            if(res.isConfirmed) window.location.href='/login'; 
+        .then((res) => {
+            if(res.isConfirmed) window.location.href='/login';
         });
     }
 </script>
