@@ -37,4 +37,7 @@ public class nxvBlindBox {
         createdAt = LocalDateTime.now();
         if (isActive == null) isActive = true;
     }
+    @ManyToOne
+    @JoinColumn(name = "CategoryID")
+    private nxvCategory nxvCategory;
 }

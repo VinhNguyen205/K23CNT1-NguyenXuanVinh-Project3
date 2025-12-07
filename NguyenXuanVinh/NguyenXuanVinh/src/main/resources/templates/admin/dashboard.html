@@ -2,214 +2,128 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
+    <title>Admin Dashboard | NXV BlindBox</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-
-    <style>
-        /* --- GLOBAL & THEME CONFIG --- */
-        body.bg-light {
-            background-color: #0b0c10 !important; /* Nền đen chủ đạo */
-            color: #c5c6c7;
-            font-family: 'Montserrat', sans-serif;
-        }
-
-        /* --- NAVBAR --- */
-        .navbar {
-            background-color: rgba(31, 40, 51, 0.95) !important;
-            border-bottom: 2px solid #45a29e;
-            box-shadow: 0 4px 15px rgba(102, 252, 241, 0.1);
-        }
-        .navbar-brand {
-            color: #66fcf1 !important;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .btn-outline-light { color: #66fcf1; border-color: #66fcf1; }
-        .btn-outline-light:hover { background: #66fcf1; color: #000; }
-
-        /* --- CARDS --- */
-        .card {
-            background-color: #1f2833;
-            border: 1px solid #45a29e;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
-        .card-header {
-            background-color: #0b0c10 !important;
-            border-bottom: 1px solid #45a29e;
-            color: #66fcf1 !important;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .list-group-item {
-            background-color: #1f2833;
-            border-bottom: 1px solid #2a2a40;
-            color: #fff;
-        }
-
-        /* --- STATS CARDS (Thẻ thống kê) --- */
-        .stat-card {
-            border-radius: 15px;
-            color: white;
-            padding: 25px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(102, 252, 241, 0.2); }
-
-        /* Màu Gradient Neon */
-        .bg-gradient-primary { background: linear-gradient(135deg, #1e3c72, #2a5298); border: 1px solid #66fcf1; }
-        .bg-gradient-success { background: linear-gradient(135deg, #11998e, #38ef7d); border: 1px solid #2ecc71; }
-        .bg-gradient-warning { background: linear-gradient(135deg, #f2994a, #f2c94c); border: 1px solid #f1c40f; color: #000; }
-
-        .stat-card h2 { font-weight: 800; margin-top: 10px; font-size: 28px; text-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-        .stat-card h5 { font-size: 14px; text-transform: uppercase; opacity: 0.8; font-weight: 600; }
-
-        /* --- TABLE (Bảng dữ liệu) --- */
-        .table { color: #c5c6c7 !important; border-color: #45a29e; --bs-table-bg: transparent; }
-        .table-dark {
-            background-color: #0b0c10 !important;
-            color: #66fcf1;
-            border-bottom: 2px solid #45a29e;
-        }
-        .table-hover tbody tr:hover {
-            background-color: rgba(102, 252, 241, 0.1) !important;
-            color: #fff;
-        }
-        .table td, .table th { border-color: #2a2a40; vertical-align: middle; padding: 12px; }
-        .badge { font-weight: 600; padding: 6px 10px; }
-
-        /* --- FORM INPUTS (Fix lỗi chữ trắng nền trắng) --- */
-        .form-control, .form-select {
-            background-color: #0b0c10 !important;
-            border: 1px solid #45a29e;
-            color: #fff !important;
-            padding: 10px;
-        }
-        .form-control:focus, .form-select:focus {
-            background-color: #1f2833 !important;
-            border-color: #66fcf1;
-            box-shadow: 0 0 10px rgba(102, 252, 241, 0.3);
-            color: #fff !important;
-        }
-        /* Quan trọng: Màu nền option dropdown */
-        option { background-color: #0b0c10; color: #fff; padding: 10px; }
-
-        /* --- MODAL (Popup) --- */
-        .modal-content {
-            background-color: #1f2833;
-            border: 1px solid #66fcf1;
-            box-shadow: 0 0 40px rgba(102, 252, 241, 0.2);
-            color: #fff;
-        }
-        .modal-header { border-bottom: 1px solid #45a29e; background: #0b0c10; }
-        .modal-footer { border-top: 1px solid #45a29e; background: #0b0c10; }
-        .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
-
-        /* --- BUTTONS --- */
-        .btn-primary {
-            background-color: #45a29e; border-color: #45a29e; color: #0b0c10; font-weight: bold;
-        }
-        .btn-primary:hover {
-            background-color: #66fcf1; border-color: #66fcf1; box-shadow: 0 0 15px #66fcf1; color: #000;
-        }
-        .btn-success { background-color: #2ecc71; border: none; font-weight: bold; color: #000; }
-        .btn-success:hover { background-color: #27ae60; box-shadow: 0 0 15px #2ecc71; }
-
-        .btn-danger { background-color: #ff4757; border: none; font-weight: bold; }
-        .btn-danger:hover { background-color: #ff6b81; box-shadow: 0 0 15px #ff4757; }
-
-        /* --- AVATAR --- */
-        .avatar-circle {
-            width: 35px; height: 35px; border-radius: 50%;
-            background: #45a29e; color: #0b0c10;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 14px;
-            border: 2px solid #66fcf1;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-<body class="bg-light">
+<body>
 
-<nav class="navbar navbar-dark bg-dark mb-4">
-    <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1"><i class="fas fa-tools"></i> ADMIN QUẢN TRỊ</span>
-        <div class="d-flex align-items-center text-white">
-            <span class="me-3">Xin chào, <b th:text="${nxvUser.fullName}" style="color: #66fcf1;">Admin</b></span>
-            <a href="/" class="btn btn-outline-light btn-sm me-2"><i class="fas fa-home"></i> Trang chủ</a>
-            <a href="/logout" class="btn btn-danger btn-sm"><i class="fas fa-sign-out-alt"></i> Thoát</a>
-        </div>
+<div class="sidebar d-flex flex-column">
+    <div class="sidebar-brand">
+        <i class="fas fa-gamepad"></i> NXV ADMIN
     </div>
-</nav>
 
-<div class="container">
+    <ul class="nav flex-column mb-auto">
+        <li class="nav-item">
+            <a href="/admin/feedbacks" class="nav-link"><i class="fas fa-envelope"></i> Phản Hồi</a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/orders" class="nav-link"><i class="fas fa-shopping-cart"></i> Đơn Hàng</a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/inventory" class="nav-link" style="color: var(--neon-yellow);"><i class="fas fa-warehouse"></i> Kho & Cảnh Báo</a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/categories" class="nav-link"><i class="fas fa-list"></i> Danh Mục</a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/banners" class="nav-link"><i class="fas fa-images"></i> Banner / Slider</a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/news" class="nav-link"><i class="fas fa-newspaper"></i> Tin Tức</a>
+        </li>
+        <li class="nav-item">
+            <a href="/admin/feedbacks" class="nav-link"><i class="fas fa-envelope"></i> Phản Hồi</a>
+        </li>
+        <li class="nav-item mt-4 pt-3 border-top border-secondary">
+            <a href="/" class="nav-link text-info fw-bold">
+                <i class="fas fa-home me-2"></i> Về Trang Web
+            </a>
+        </li>
+    </ul>
 
-    <div class="row mb-4">
+    <div class="p-3 border-top border-secondary">
+        <div class="d-flex align-items-center mb-3">
+            <div class="avatar-circle me-2" th:text="${#strings.substring(nxvUser.username,0,1).toUpperCase()}">A</div>
+            <div>
+                <div class="fw-bold text-light" th:text="${nxvUser.fullName}">Admin</div>
+                <div class="small text-muted">Super Admin</div>
+            </div>
+        </div>
+        <a href="/logout" class="btn btn-sm btn-outline-danger w-100"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a>
+    </div>
+</div>
+
+<div class="main-content">
+
+    <div class="row g-4 mb-4">
         <div class="col-md-4">
-            <div class="stat-card bg-gradient-primary">
-                <h5><i class="fas fa-users"></i> Tổng Thành Viên</h5>
-                <h2 th:text="${stats.totalUsers}">0</h2>
+            <div class="stat-card" style="border-bottom: 3px solid var(--neon-cyan);">
+                <i class="fas fa-users icon-bg" style="color: var(--neon-cyan);"></i>
+                <p>Tổng Thành Viên</p>
+                <h3 th:text="${stats.totalUsers}">0</h3>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="stat-card bg-gradient-success">
-                <h5><i class="fas fa-wallet"></i> Tổng Tiền Nạp</h5>
-                <h2 th:text="${#numbers.formatDecimal(stats.totalDeposit, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</h2>
+            <div class="stat-card" style="border-bottom: 3px solid var(--neon-green);">
+                <i class="fas fa-wallet icon-bg" style="color: var(--neon-green);"></i>
+                <p>Tổng Tiền Nạp</p>
+                <h3 class="text-success" th:text="${#numbers.formatDecimal(stats.totalDeposit, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</h3>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="stat-card bg-gradient-warning">
-                <h5><i class="fas fa-shopping-cart"></i> Tổng Doanh Thu</h5>
-                <h2 th:text="${#numbers.formatDecimal(stats.totalSpent, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</h2>
+            <div class="stat-card" style="border-bottom: 3px solid var(--neon-yellow);">
+                <i class="fas fa-coins icon-bg" style="color: var(--neon-yellow);"></i>
+                <p>Doanh Thu Thực</p>
+                <h3 style="color: var(--neon-yellow);" th:text="${#numbers.formatDecimal(stats.totalSpent, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</h3>
             </div>
         </div>
     </div>
 
     <div class="row">
         <div class="col-lg-8">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 style="color: #66fcf1; font-weight: 800;">📦 DANH SÁCH HỘP MÙ</h4>
-                <button class="btn btn-success" onclick="openModal()">
-                    <i class="fas fa-plus-circle"></i> Thêm Mới
-                </button>
-            </div>
+            <div class="neon-card">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="text-light m-0"><i class="fas fa-box-open me-2 text-info"></i> QUẢN LÝ HỘP MÙ</h5>
+                    <button class="btn btn-neon btn-sm" onclick="openModal()">
+                        <i class="fas fa-plus"></i> Thêm Hộp Mới
+                    </button>
+                </div>
 
-            <div class="card shadow mb-4">
-                <div class="card-body p-0">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-dark">
+                <div class="table-responsive">
+                    <table class="table table-dark-custom table-hover">
+                        <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Ảnh</th>
                             <th>Tên Hộp</th>
-                            <th>Giá tiền</th>
-                            <th>Trạng thái</th>
-                            <th>Hành động</th>
+                            <th>Danh Mục</th>
+                            <th>Giá</th>
+                            <th>Trạng Thái</th>
+                            <th>Thao Tác</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:each="box : ${boxes}">
-                            <td th:text="${box.boxId}" style="font-weight: bold;">1</td>
-                            <td><img th:src="${box.imageUrl}" width="45" class="rounded border border-secondary"></td>
-                            <td th:text="${box.boxName}" class="fw-bold text-white">Tên hộp</td>
-                            <td th:text="${#numbers.formatDecimal(box.price, 0, 'COMMA', 0, 'POINT')} + ' đ'" style="color: #f1c40f; font-weight: bold;"></td>
                             <td>
-                                <span th:if="${box.isActive}" class="badge bg-success">Đang bán</span>
-                                <span th:unless="${box.isActive}" class="badge bg-secondary">Ngừng bán</span>
+                                <img th:src="${box.imageUrl}" width="40" height="40" class="rounded border border-secondary" style="object-fit: cover;">
+                            </td>
+                            <td class="fw-bold text-white" th:text="${box.boxName}">Box Name</td>
+                            <td class="text-info" th:text="${box.nxvCategory != null ? box.nxvCategory.categoryName : 'Chưa phân loại'}">Category</td>
+                            <td class="text-warning fw-bold" th:text="${#numbers.formatDecimal(box.price, 0, 'COMMA', 0, 'POINT')}">0</td>
+                            <td>
+                                <span th:if="${box.isActive}" class="badge bg-success bg-opacity-25 text-success border border-success">Active</span>
+                                <span th:unless="${box.isActive}" class="badge bg-secondary">Inactive</span>
                             </td>
                             <td>
-                                <button class="btn btn-primary btn-sm"
-                                        th:onclick="openModal([[${box.boxId}]], [[${box.boxName}]], [[${box.price}]], [[${box.description}]], [[${box.imageUrl}]])">
+                                <button class="btn btn-sm btn-outline-info border-0"
+                                        th:onclick="openModal([[${box.boxId}]], [[${box.boxName}]], [[${box.price}]], [[${box.description}]], [[${box.imageUrl}]], [[${box.nxvCategory != null ? box.nxvCategory.id : ''}]])">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <a th:href="@{/admin/delete-box/{id}(id=${box.boxId})}"
-                                   class="btn btn-danger btn-sm" onclick="return confirm('Bạn chắc chắn muốn xóa?')">
+                                <a th:href="@{/admin/delete-box/{id}(id=${box.boxId})}" class="btn btn-sm btn-outline-danger border-0" onclick="return confirm('Xóa hộp này?');">
                                     <i class="fas fa-trash"></i>
                                 </a>
                             </td>
@@ -221,74 +135,94 @@
         </div>
 
         <div class="col-lg-4">
-
-            <div class="card shadow mb-4">
-                <div class="card-header">
-                    <i class="fas fa-hand-holding-usd"></i> Bơm Tiền Nhanh
-                </div>
-                <div class="card-body">
-                    <form action="/admin/add-money" method="post">
-                        <div class="mb-3">
-                            <label class="form-label text-muted small">Chọn thành viên:</label>
-                            <select name="userId" class="form-select" required>
-                                <option value="" disabled selected>-- Chọn User --</option>
-                                <option th:each="u : ${users}"
-                                        th:value="${u.userId}"
-                                        th:text="${u.username} + ' - ' + ${u.fullName}"></option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label text-muted small">Số tiền (VNĐ):</label>
-                            <input type="number" name="amount" class="form-control" value="500000" step="10000" min="0">
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 fw-bold">🚀 Bơm Ngay</button>
-                    </form>
-                </div>
+            <div class="neon-card">
+                <h6 class="text-light mb-3"><i class="fas fa-hand-holding-usd text-success"></i> BƠM TIỀN USER</h6>
+                <form action="/admin/add-money" method="post">
+                    <div class="mb-3">
+                        <select name="userId" class="form-select form-select-sm" required>
+                            <option value="" disabled selected>-- Chọn User --</option>
+                            <option th:each="u : ${users}" th:value="${u.userId}" th:text="${u.username} + ' (' + ${u.fullName} + ')'"></option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-dark border-secondary text-light">VNĐ</span>
+                        <input type="number" name="amount" class="form-control" placeholder="Nhập số tiền..." required>
+                    </div>
+                    <button type="submit" class="btn btn-neon w-100"><i class="fas fa-bolt"></i> NẠP NGAY</button>
+                </form>
             </div>
 
-            <div class="card shadow">
-                <div class="card-header" style="color: #f1c40f !important;">
-                    <i class="fas fa-trophy"></i> Top Đại Gia
-                </div>
-                <div class="card-body p-0">
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between align-items-center" th:each="top, iter : ${topUsers}">
-                            <div class="d-flex align-items-center">
-                                <span class="badge me-2"
-                                      th:classappend="${iter.index == 0} ? 'bg-warning text-dark' : 'bg-secondary'"
-                                      th:text="'#' + ${iter.count}">1</span>
-                                <div class="avatar-circle me-2" th:text="${#strings.substring(top.user.username,0,1).toUpperCase()}">U</div>
-                                <span class="fw-bold small" th:text="${top.user.fullName}">Name</span>
-                            </div>
-                            <span class="fw-bold small" style="color: #2ecc71;"
-                                  th:text="${#numbers.formatDecimal(top.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
-                        </li>
-                    </ul>
+            <div class="neon-card">
+                <h6 class="text-light mb-3"><i class="fas fa-crown text-warning"></i> TOP ĐẠI GIA</h6>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item bg-transparent text-light border-bottom border-secondary d-flex justify-content-between align-items-center px-0"
+                         th:each="top, iter : ${topUsers}">
+                        <div class="d-flex align-items-center">
+                            <span class="badge rounded-pill bg-dark border border-secondary me-2" th:text="${iter.count}">1</span>
+                            <span th:text="${top.user.username}">User</span>
+                        </div>
+                        <span class="text-warning fw-bold" th:text="${#numbers.formatDecimal(top.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</span>
+                    </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
 
 <div class="modal fade" id="productModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog">
         <div class="modal-content">
             <form action="/admin/save-box" method="post">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">Thêm Hộp Mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title text-info" id="modalTitle">THÔNG TIN HỘP MÙ</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="boxId" name="boxId">
-                    <div class="mb-3"><label>Tên Hộp</label><input type="text" class="form-control" id="boxName" name="boxName" required></div>
-                    <div class="mb-3"><label>Giá tiền</label><input type="number" class="form-control" id="price" name="price" required></div>
-                    <div class="mb-3"><label>Mô tả</label><textarea class="form-control" id="description" name="description"></textarea></div>
-                    <div class="mb-3"><label>Link Ảnh</label><input type="text" class="form-control" id="imageUrl" name="imageUrl" placeholder="/images/..."></div>
+
+                    <div class="mb-3">
+                        <label class="small text-muted">Tên Hộp</label>
+                        <input type="text" class="form-control" id="boxName" name="boxName" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="small text-muted">Danh Mục</label>
+                        <select class="form-select" id="boxCategory" name="nxvCategory.id">
+                            <option value="" disabled selected>-- Chọn Danh Mục --</option>
+                            <option th:each="cat : ${listCategories}"
+                                    th:value="${cat.id}"
+                                    th:text="${cat.categoryName}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="small text-muted">Giá Tiền</label>
+                            <input type="number" class="form-control" id="price" name="price" required>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="small text-muted">Trạng Thái</label>
+                            <select class="form-select" name="isActive">
+                                <option value="true">Đang Bán</option>
+                                <option value="false">Ngừng Bán</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="small text-muted">Link Ảnh (URL)</label>
+                        <input type="text" class="form-control" id="imageUrl" name="imageUrl" placeholder="/images/box.jpg">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="small text-muted">Mô Tả</label>
+                        <textarea class="form-control" id="description" name="description" rows="2"></textarea>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary">Lưu Lại</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-neon">LƯU DỮ LIỆU</button>
                 </div>
             </form>
         </div>
@@ -297,13 +231,17 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    function openModal(id = '', name = '', price = '', desc = '', img = '') {
+    function openModal(id = '', name = '', price = '', desc = '', img = '', catId = '') {
         document.getElementById('boxId').value = id;
         document.getElementById('boxName').value = name;
         document.getElementById('price').value = price;
         document.getElementById('description').value = desc;
         document.getElementById('imageUrl').value = img;
-        document.getElementById('modalTitle').innerText = id ? "Cập Nhật Hộp" : "Thêm Hộp Mới";
+
+        const catSelect = document.getElementById('boxCategory');
+        catSelect.value = catId;
+
+        document.getElementById('modalTitle').innerText = id ? "CẬP NHẬT HỘP MÙ" : "THÊM HỘP MỚI";
         new bootstrap.Modal(document.getElementById('productModal')).show();
     }
 </script>

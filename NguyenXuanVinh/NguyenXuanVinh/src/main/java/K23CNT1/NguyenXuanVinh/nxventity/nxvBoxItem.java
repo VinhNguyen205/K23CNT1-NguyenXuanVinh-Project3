@@ -40,4 +40,12 @@ public class nxvBoxItem {
 
     @Column(name = "IsPityReward")
     private Boolean isPityReward;
+
+    @PrePersist
+    protected void onCreate() {
+        if (stockQuantity == null) stockQuantity = 0;
+        if (isHidden == null) isHidden = false; // Mặc định là hiện (hoặc true nếu là item bí mật)
+        if (isPityReward == null) isPityReward = false;
+        if (marketValue == null) marketValue = BigDecimal.ZERO;
+    }
 }

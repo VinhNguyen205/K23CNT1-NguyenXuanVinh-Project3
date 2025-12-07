@@ -257,3 +257,53 @@ WHILE @i <= 15 BEGIN
 END
 
 GO
+
+USE BlindBoxDB;
+GO
+
+-- 1. Thêm cột CategoryID vào bảng BlindBoxes
+ALTER TABLE BlindBoxes
+ADD CategoryID INT;
+GO
+
+-- 2. Tạo khóa ngoại liên kết BlindBoxes với Categories
+ALTER TABLE BlindBoxes
+ADD CONSTRAINT FK_BlindBoxes_Categories
+FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID);
+GO
+
+USE BlindBoxDB;
+GO
+
+-- 1. Bảng Banners (Quảng cáo chạy slide)
+CREATE TABLE Banners (
+    BannerID INT IDENTITY(1,1) PRIMARY KEY,
+    Title NVARCHAR(100),
+    ImageURL NVARCHAR(MAX) NOT NULL,
+    LinkUrl NVARCHAR(MAX), -- Link khi bấm vào banner (VD: trỏ đến hộp mù mới)
+    DisplayOrder INT DEFAULT 0, -- Thứ tự hiển thị
+    IsActive BIT DEFAULT 1,
+    CreatedAt DATETIME DEFAULT GETDATE()
+);
+
+-- 2. Bảng Feedbacks (Phản hồi & Khiếu nại từ khách)
+CREATE TABLE Feedbacks (
+    FeedbackID INT IDENTITY(1,1) PRIMARY KEY,
+    UserID INT FOREIGN KEY REFERENCES Users(UserID), -- Null nếu khách vãng lai
+    CustomerName NVARCHAR(100), -- Tên người gửi
+    Email NVARCHAR(100),
+    Subject NVARCHAR(200), -- Chủ đề (VD: Khiếu nại nạp tiền)
+    Content NVARCHAR(MAX),
+    Status NVARCHAR(50) DEFAULT 'PENDING', -- PENDING, PROCESSING, RESOLVED
+    SentAt DATETIME DEFAULT GETDATE(),
+    ReplyContent NVARCHAR(MAX) -- Nội dung Admin trả lời
+);
+GO
+
+USE BlindBoxDB;
+GO
+
+-- Thêm cột ImageURL và IsActive vào bảng Categories
+ALTER TABLE Categories ADD ImageURL NVARCHAR(MAX);
+ALTER TABLE Categories ADD IsActive BIT DEFAULT 1;
+GO

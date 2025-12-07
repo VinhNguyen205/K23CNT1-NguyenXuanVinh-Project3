@@ -10,4 +10,5 @@ import java.util.List;
 public interface nxvOrderRepository extends JpaRepository<nxvOrder, Integer> {
     // Lịch sử mua hàng (Mới nhất lên đầu)
     List<nxvOrder> findByUserOrderByOrderDateDesc(nxvUser user);
+    List<nxvOrder> findAllByOrderByOrderDateDesc();
 }

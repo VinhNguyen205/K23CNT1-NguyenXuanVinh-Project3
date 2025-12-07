@@ -1,4 +1,4 @@
-package K23CNT1.NguyenXuanVinh.nxvservice.impl;
+package K23CNT1.NguyenXuanVinh.nxvservice.nxvimpl;
 
 import K23CNT1.NguyenXuanVinh.nxventity.*;
 import K23CNT1.NguyenXuanVinh.nxvrepository.*;

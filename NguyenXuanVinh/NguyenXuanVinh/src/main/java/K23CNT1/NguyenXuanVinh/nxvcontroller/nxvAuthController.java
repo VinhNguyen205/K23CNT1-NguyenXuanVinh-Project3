@@ -1,99 +1,111 @@
 package K23CNT1.NguyenXuanVinh.nxvcontroller;
 
-// Đã đổi tên các file phụ thuộc
-import K23CNT1.NguyenXuanVinh.nxvdto.nxvLoginRequest;
-import K23CNT1.NguyenXuanVinh.nxvdto.nxvRegisterRequest;
 import K23CNT1.NguyenXuanVinh.nxventity.nxvUser;
 import K23CNT1.NguyenXuanVinh.nxvrepository.nxvUserRepository;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 
 @Controller
-public class nxvAuthController { // Đã đổi tên Class
+@RequiredArgsConstructor // Tự động Inject Repository (Thay cho @Autowired thủ công)
+public class nxvAuthController {
 
-    @Autowired
-    private nxvUserRepository nxvUserRepository; // Đã đổi tên Type và variable
+    private final nxvUserRepository nxvUserRepository;
 
     // ============================================================
-    // PHẦN 1: ĐIỀU HƯỚNG TRANG (VIEW)
+    // PHẦN 1: HIỂN THỊ TRANG (VIEW)
     // ============================================================
 
     @GetMapping("/login")
     public String showLoginForm() {
-        return "login";
+        return "login"; // Trả về file login.html
     }
 
     @GetMapping("/register")
     public String showRegisterForm() {
-        return "register";
+        return "register"; // Trả về file register.html
     }
 
     // ============================================================
-    // PHẦN 2: XỬ LÝ API (LOGIC)
+    // PHẦN 2: XỬ LÝ FORM SUBMIT (LOGIC)
     // ============================================================
 
     /**
-     * API Đăng Nhập
+     * Xử lý Đăng Nhập (Form Submit)
      */
-    @PostMapping("/api/auth/login")
-    @ResponseBody
-    public ResponseEntity<?> login(@RequestBody nxvLoginRequest request, HttpSession session) { // DTO đã đổi tên
-        // 1. Tìm user trong DB
-        nxvUser user = nxvUserRepository.findByUsername(request.getUsername()).orElse(null); // Type và Repository đã đổi
+    @PostMapping("/login")
+    public String handleLogin(@RequestParam String username,
+                              @RequestParam String password,
+                              HttpSession session,
+                              Model model) {
 
-        if (user != null && user.getPasswordHash().equals(request.getPassword())) {
-            // Lưu vào Session
+        // 1. Tìm user trong DB
+        nxvUser user = nxvUserRepository.findByUsername(username).orElse(null);
+
+        // 2. Kiểm tra mật khẩu (So sánh chuỗi thường, thực tế nên mã hóa)
+        if (user != null && user.getPasswordHash().equals(password)) {
+            // Lưu User vào Session để dùng xuyên suốt
             session.setAttribute("currentUser", user);
 
-            // Xác định quyền (Role)
-            String role = (user.getIsAdmin() != null && user.getIsAdmin()) ? "ADMIN" : "USER";
-
-            // Tạo phản hồi JSON chuẩn bằng Map
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Đăng nhập thành công!");
-            response.put("role", role);
-
-            return ResponseEntity.ok(response);
+            // Phân quyền điều hướng
+            if (Boolean.TRUE.equals(user.getIsAdmin())) {
+                return "redirect:/admin"; // Admin vào trang quản trị
+            } else {
+                return "redirect:/"; // User thường về trang chủ
+            }
         }
 
-        // Đăng nhập thất bại
-        return ResponseEntity.badRequest().body("Sai tài khoản hoặc mật khẩu!");
+        // 3. Đăng nhập thất bại -> Trả về trang login kèm thông báo lỗi
+        model.addAttribute("error", "Sai tên đăng nhập hoặc mật khẩu!");
+        return "login";
     }
 
     /**
-     * API Đăng Ký
+     * Xử lý Đăng Ký (Form Submit)
      */
-    @PostMapping("/api/auth/register")
-    @ResponseBody
-    public ResponseEntity<?> register(@RequestBody nxvRegisterRequest request) { // DTO đã đổi tên
-        // 1. Kiểm tra trùng tên đăng nhập
-        if (nxvUserRepository.findByUsername(request.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest().body("Tên đăng nhập đã tồn tại!");
+    @PostMapping("/register")
+    public String handleRegister(@RequestParam String username,
+                                 @RequestParam String password,
+                                 @RequestParam String confirmPassword,
+                                 @RequestParam String fullName,
+                                 @RequestParam String email,
+                                 Model model) {
+
+        // 1. Kiểm tra mật khẩu nhập lại
+        if (!password.equals(confirmPassword)) {
+            model.addAttribute("error", "Mật khẩu nhập lại không khớp!");
+            return "register";
         }
 
-        // 2. Tạo user mới
-        nxvUser newUser = new nxvUser(); // Type đã đổi tên
-        newUser.setUsername(request.getUsername());
-        newUser.setPasswordHash(request.getPassword());
-        newUser.setFullName(request.getFullName());
-        newUser.setEmail(request.getEmail());
-        newUser.setWalletBalance(BigDecimal.ZERO);
-        newUser.setIsAdmin(false);
+        // 2. Kiểm tra trùng tên đăng nhập
+        if (nxvUserRepository.findByUsername(username).isPresent()) {
+            model.addAttribute("error", "Tên đăng nhập đã tồn tại!");
+            return "register";
+        }
 
-        nxvUserRepository.save(newUser); // Repository đã đổi tên
+        // 3. Tạo User mới
+        try {
+            nxvUser newUser = new nxvUser();
+            newUser.setUsername(username);
+            newUser.setPasswordHash(password); // Lưu ý: Chưa mã hóa (cho project học tập)
+            newUser.setFullName(fullName);
+            newUser.setEmail(email);
+            newUser.setWalletBalance(BigDecimal.ZERO); // Ví 0 đồng
+            newUser.setIsAdmin(false); // Mặc định là User thường
 
-        // 3. Trả về kết quả JSON
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Đăng ký thành công! Hãy đăng nhập ngay.");
+            nxvUserRepository.save(newUser);
 
-        return ResponseEntity.ok(response);
+            // Đăng ký thành công -> Chuyển sang trang Login
+            return "redirect:/login?success";
+
+        } catch (Exception e) {
+            model.addAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+            return "register";
+        }
     }
 
     // ============================================================
@@ -102,7 +114,7 @@ public class nxvAuthController { // Đã đổi tên Class
 
     @GetMapping("/logout")
     public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/login";
+        session.invalidate(); // Xóa sạch session
+        return "redirect:/"; // Về trang chủ
     }
 }

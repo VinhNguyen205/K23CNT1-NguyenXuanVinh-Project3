@@ -1,20 +1,29 @@
 package K23CNT1.NguyenXuanVinh.nxventity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
-@Data
 @Entity
 @Table(name = "Categories")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class nxvCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CategoryID")
-    private Integer categoryId;
+    private Integer id;
 
-    @Column(name = "CategoryName")
+    @Column(name = "CategoryName", nullable = false)
     private String categoryName;
 
     @Column(name = "Description")
     private String description;
+
+    @Column(name = "ImageURL")
+    private String imageUrl;
+
+    @Column(name = "IsActive")
+    private Boolean isActive;
 }

@@ -1,32 +1,38 @@
 package K23CNT1.NguyenXuanVinh.nxventity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import java.time.LocalDateTime;
 
-@Data
 @Entity
 @Table(name = "News")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class nxvNews {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "NewsID")
     private Integer newsId;
 
-    @Column(name = "Title")
+    @Column(name = "Title", nullable = false, length = 200)
     private String title;
 
     @Column(name = "Content", columnDefinition = "NVARCHAR(MAX)")
     private String content;
 
     @Column(name = "Thumbnail")
-    private String thumbnail;
+    private String thumbnail; // Link ảnh bìa bài viết
 
     @Column(name = "PublishedAt")
     private LocalDateTime publishedAt;
 
     @PrePersist
     protected void onCreate() {
-        publishedAt = LocalDateTime.now();
+        if (publishedAt == null) {
+            publishedAt = LocalDateTime.now();
+        }
     }
 }
