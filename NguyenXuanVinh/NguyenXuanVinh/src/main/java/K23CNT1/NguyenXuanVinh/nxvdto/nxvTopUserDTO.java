@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class nxvTopUserDTO { // Đã đổi tên Class
-    private nxvUser user; // Đã đổi tên Type
+public class nxvTopUserDTO {
+    private nxvUser user;
     private BigDecimal totalAmount;
 }

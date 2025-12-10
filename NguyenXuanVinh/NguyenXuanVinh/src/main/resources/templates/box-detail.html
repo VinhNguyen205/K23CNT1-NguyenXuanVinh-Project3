@@ -2,10 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${box.boxName}">Chi tiết hộp</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <title th:text="${box.boxName} + ' | Mystery Box'">Chi Tiết Hộp</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css?v=2">
 </head>
 <body>
 
@@ -16,28 +17,38 @@
 
     <div class="menu">
         <a href="/" class="nav-link">🏠 Trang Chủ</a>
-        <a href="/cart" class="nav-link">🛒 Giỏ Hàng</a>
-        <a href="/inventory" class="nav-link">🎒 Kho Đồ</a>
+        <a href="/shop" class="nav-link">🛍️ Cửa Hàng</a>
         <a href="/deposit" class="nav-link deposit-btn">💎 Nạp Xu</a>
-
-        <a href="/admin" class="nav-link admin-btn" th:if="${nxvUser != null and nxvUser.isAdmin}">🛠️ Quản Trị</a>
+        <a href="/admin" class="nav-link" style="border: 1px solid #ff4757; color: #ff4757;" th:if="${nxvUser != null and nxvUser.isAdmin}">🛠️ Quản Trị</a>
     </div>
 
     <div class="user-info" th:if="${nxvUser != null}">
-        <div class="user-details">
-            <a href="/profile" style="color: #fff; text-decoration: none; font-weight: 600;">
-                Xin chào, <span th:text="${nxvUser.fullName}" style="color: #66fcf1;">User</span>
-            </a>
-            <br>
-            <a href="/logout" class="logout-link">🚪 Đăng xuất</a>
+        <div class="wallet me-3" style="font-size: 14px;">
+            💰 <span th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span>
         </div>
-        <div class="wallet">
-            💰 <span th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span> VNĐ
+        <div class="user-dropdown">
+            <div class="text-end me-2 d-none d-md-block">
+                <div style="font-size: 12px; color: #888;">Xin Chào,</div>
+                <div style="font-weight: bold; color: var(--neon-cyan);" th:text="${nxvUser.username}">User</div>
+            </div>
+            <img th:src="'https://ui-avatars.com/api/?background=random&color=fff&name=' + ${nxvUser.fullName}" class="user-avatar" alt="Avatar">
+
+            <div class="dropdown-menu-custom">
+                <div style="padding: 15px; border-bottom: 1px solid #333; text-align: center;">
+                    <span style="color: var(--neon-pink); font-weight: bold;">THÀNH VIÊN VIP</span>
+                </div>
+                <a href="/profile" class="dropdown-item-custom"><i class="fas fa-id-card"></i> Hồ Sơ</a>
+                <a href="/inventory" class="dropdown-item-custom"><i class="fas fa-box-open"></i> Kho Đồ</a>
+                <a href="/cart" class="dropdown-item-custom"><i class="fas fa-shopping-cart"></i> Giỏ Hàng</a>
+                <a href="/logout" class="dropdown-item-custom" style="color: var(--neon-pink);"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a>
+            </div>
         </div>
     </div>
 
     <div class="user-info" th:if="${nxvUser == null}">
-        <a href="/login" class="btn-buy" style="padding: 8px 20px; text-decoration: none; width: auto; margin: 0;">Đăng Nhập</a>
+        <a href="/login" class="btn-buy" style="padding: 8px 20px; text-decoration: none; width: auto; margin: 0;">
+            <i class="fas fa-user"></i> Đăng Nhập
+        </a>
     </div>
 </header>
 
@@ -45,111 +56,147 @@
 
     <div class="detail-container">
         <div class="detail-image">
-            <img th:src="${box.imageUrl}" alt="Box Image">
+            <img th:src="${box.imageUrl}" alt="Box Image" class="img-fluid">
         </div>
+
         <div class="detail-info">
-            <h1 th:text="${box.boxName}">Tên Hộp</h1>
-            <div class="price-tag large" th:text="${#numbers.formatDecimal(box.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">100.000 đ</div>
-            <p class="desc" th:text="${box.description}">Mô tả...</p>
+            <h1 th:text="${box.boxName}" style="text-shadow: 0 0 10px var(--neon-cyan);">Tên Hộp</h1>
+
+            <div class="price-tag large" style="font-size: 2.5rem; color: var(--neon-yellow);">
+                <span th:text="${#numbers.formatDecimal(box.price, 0, 'COMMA', 0, 'POINT')}">100.000</span> đ
+            </div>
+
+            <p class="desc text-muted mb-4" th:text="${box.description}">Mô Tả Chi Tiết...</p>
 
             <div class="action-buttons vertical">
-                <button class="btn-buy big-btn" th:onclick="'openBox(' + ${box.boxId} + ')'"><i class="fas fa-magic"></i> MỞ NGAY (1 LẦN)</button>
-                <button class="btn-cart big-btn" th:onclick="'addToCart(' + ${box.boxId} + ')'"><i class="fas fa-cart-plus"></i> THÊM VÀO GIỎ</button>
+                <button class="btn-buy big-btn" th:onclick="'openBox(' + ${box.boxId} + ')'">
+                    <i class="fas fa-magic me-2"></i> MỞ NGAY (1 LẦN)
+                </button>
+                <button class="btn-cart big-btn" th:onclick="'addToCart(' + ${box.boxId} + ')'">
+                    <i class="fas fa-cart-plus me-2"></i> THÊM VÀO GIỎ
+                </button>
             </div>
         </div>
     </div>
 
     <h2 class="section-title" style="margin-top: 80px;">✨ CÓ GÌ BÊN TRONG? ✨</h2>
+
     <div class="showcase-grid">
         <div class="showcase-item" th:each="item : ${items}">
             <div class="rarity-badge" th:text="${item.rarityLevel}"
                  th:classappend="'rank-' + ${item.rarityLevel}">S</div>
 
-            <img th:src="${item.imageUrl}" alt="Item">
-            <p class="item-name" th:text="${item.itemName}">Tên món</p>
-            <p class="drop-rate"
-               th:text="'Tỉ lệ: ' + ${#numbers.formatDecimal(item.probability * 100, 1, 2)} + '%'">1%</p>
+            <div class="img-wrapper">
+                <img th:src="${item.imageUrl}" alt="Item">
+            </div>
+
+            <div class="item-info">
+                <p class="item-name" th:text="${item.itemName}">Tên Vật Phẩm</p>
+                <div class="drop-rate-box">
+                    <span class="drop-rate">
+                        <i class="fas fa-dice"></i>
+                        <span th:text="${#numbers.formatDecimal(item.probability * 100, 1, 2)} + '%'">1.5%</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div th:if="${items.isEmpty()}" class="text-center text-muted col-12">
+            <p>Chưa Có Thông Tin Vật Phẩm Cho Hộp Này.</p>
         </div>
     </div>
 
 </div>
 
+<footer class="mt-5 text-center p-4 border-top border-secondary text-muted">
+    &copy; 2025 Mystery Box Shop. Design by Nguyen Xuan Vinh.
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script th:inline="javascript">
+    // Lấy ID User an toàn
+    const userId = [[${nxvUser != null ? nxvUser.userId : 'null'}]];
+
     function promptLogin() {
         Swal.fire({
-            title: 'Chưa đăng nhập!',
-            text: 'Vui lòng đăng nhập để tiếp tục.',
+            title: 'Chưa Đăng Nhập!',
+            text: 'Vui Lòng Đăng Nhập Để Tiếp Tục.',
             icon: 'warning',
-            confirmButtonText: 'Đăng nhập ngay'
+            confirmButtonText: 'Đăng Nhập Ngay',
+            background: '#111', color: '#fff' // Dark theme
         }).then((res) => {
             if(res.isConfirmed) window.location.href='/login';
         });
     }
 
     function openBox(boxId) {
-        const userId = [[${nxvUser != null ? nxvUser.userId : 'null'}]];
-        if (userId === 'null' || userId === null) { promptLogin(); return; }
+        if (userId === 'null') { promptLogin(); return; }
 
         Swal.fire({
-            title: 'Đang mở hộp...',
-            html: 'Chờ xíu nhé, đang cầu nguyện nhân phẩm! 🙏',
+            title: 'Đang Mở Hộp...',
+            html: 'Chờ Xíu Nhé, Đang Cầu Nguyện Nhân Phẩm! 🙏',
             timerProgressBar: true,
+            background: '#111', color: '#fff',
             didOpen: () => { Swal.showLoading() }
         });
 
-        // Đã sửa lỗi: dùng biến userId (thay vì nxvUserId)
         fetch(`/api/blindbox/open?userId=${userId}&boxId=${boxId}`, { method: 'POST' })
         .then(res => {
-            if (!res.ok) throw new Error("Tiền không đủ hoặc lỗi mạng");
+            if (!res.ok) throw new Error("Lỗi");
             return res.json();
         })
         .then(data => showResult(data))
-        .catch(() => Swal.fire('Lỗi!', 'Bạn không đủ tiền hoặc có lỗi xảy ra.', 'error'));
+        .catch(() => Swal.fire({
+            icon: 'error', title: 'Thất Bại',
+            text: 'Số Dư Không Đủ Hoặc Lỗi Hệ Thống.',
+            background: '#111', color: '#fff'
+        }));
     }
 
     function addToCart(boxId) {
-        const userId = [[${nxvUser != null ? nxvUser.userId : 'null'}]];
-        if (userId === 'null' || userId === null) { promptLogin(); return; }
+        if (userId === 'null') { promptLogin(); return; }
 
-        // Đã sửa lỗi: dùng biến userId (thay vì nxvUserId)
-        // Lưu ý: API giỏ hàng endpoint là /api/cart/add (chứ không phải nxvCart)
         fetch(`/api/cart/add?userId=${userId}&boxId=${boxId}`, { method: 'POST' })
         .then(res => {
             if(res.ok) {
                 const Toast = Swal.mixin({
                     toast: true, position: 'top-end', showConfirmButton: false, timer: 2000,
-                    didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer);
-                        toast.addEventListener('mouseleave', Swal.resumeTimer);
-                    }
+                    background: '#111', color: '#fff',
+                    didOpen: (toast) => { toast.addEventListener('mouseenter', Swal.stopTimer); toast.addEventListener('mouseleave', Swal.resumeTimer); }
                 })
-                Toast.fire({ icon: 'success', title: 'Đã thêm vào giỏ!' })
+                Toast.fire({ icon: 'success', title: 'Đã Thêm Vào Giỏ!' })
             } else {
-                Swal.fire('Lỗi', 'Không thể thêm vào giỏ', 'error');
+                Swal.fire({icon: 'error', title: 'Lỗi', text: 'Không Thể Thêm Vào Giỏ', background: '#111', color: '#fff'});
             }
         });
     }
 
     function showResult(data) {
-        let titleColor = '#000';
+        let titleColor = '#fff';
         if(data.rarity === 'S') titleColor = '#ffd700';
         else if(data.rarity === 'A') titleColor = '#ff4757';
-        else if(data.rarity === 'B') titleColor = '#9b59b6';
-        else if(data.rarity === 'C') titleColor = '#3498db';
 
         Swal.fire({
             title: `<span style="color:${titleColor}">🎉 BẠN TRÚNG: ${data.rarity} 🎉</span>`,
             html: `
                 <div style="text-align:center">
-                    <img src="${data.itemImage}" style="width:150px; margin:10px auto; border-radius:10px; box-shadow:0 0 15px ${titleColor}">
-                    <h3>${data.itemName}</h3>
-                    <p>Số dư còn lại: <b>${new Intl.NumberFormat().format(data.currentBalance)} đ</b></p>
+                    <img src="${data.itemImage}" style="width:150px; margin:10px auto; border-radius:10px; box-shadow:0 0 20px ${titleColor}; border: 2px solid ${titleColor}">
+                    <h3 style="color: #fff; margin-top: 10px;">${data.itemName}</h3>
+                    <p style="color: #ccc;">Số dư mới: <b style="color: #66fcf1;">${new Intl.NumberFormat().format(data.currentBalance)} đ</b></p>
+                    <a href="/inventory" class="btn btn-sm btn-outline-info mt-2">Xem Kho Đồ</a>
                 </div>
             `,
-            confirmButtonText: 'Tuyệt vời!',
-            background: '#fff url(/images/confetti.gif)'
-        }).then(() => location.reload());
+            confirmButtonText: 'Mở Tiếp!',
+            showCancelButton: true,
+            cancelButtonText: 'Đóng',
+            background: '#1f2833', color: '#fff'
+        }).then((res) => {
+            if(res.isConfirmed) openBox(data.inventoryItem.boxItem.blindBox.boxId);
+            else location.reload();
+        });
     }
 </script>
 

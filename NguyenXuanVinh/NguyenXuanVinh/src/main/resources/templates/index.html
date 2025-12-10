@@ -3,67 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <title>Blind Box Shop - Gacha Game</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="/css/style.css">
 
     <style>
-        /* Tinh chỉnh Carousel */
+        /* CSS Riêng cho trang chủ */
         .carousel-item { height: 500px; background-color: #000; }
         .carousel-item img { height: 100%; object-fit: cover; opacity: 0.8; }
+
         .carousel-caption {
-            background: rgba(0, 0, 0, 0.6);
-            padding: 20px;
-            border-radius: 10px;
-            border: 1px solid var(--neon-cyan);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+            background: rgba(0, 0, 0, 0.6); padding: 20px; border-radius: 10px;
+            border: 1px solid var(--neon-cyan); box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
         }
 
-        /* Danh mục (Category) */
-        .category-bar {
-            display: flex; gap: 20px; overflow-x: auto; padding: 20px 0;
-            justify-content: center; flex-wrap: wrap;
+        /* TOP 1 USER CARD */
+        .top1-card {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(0,0,0,0.8));
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
         }
-        .cat-item {
-            background: var(--bg-card);
-            padding: 15px 25px;
-            border-radius: 50px;
-            border: 1px solid var(--neon-blue);
-            color: #fff; text-decoration: none; font-weight: bold;
-            display: flex; align-items: center; gap: 10px;
+        .crown-icon { font-size: 40px; color: #ffd700; margin-bottom: 10px; filter: drop-shadow(0 0 10px #ffd700); }
+        .top1-avatar { width: 100px; height: 100px; border: 3px solid #ffd700; border-radius: 50%; object-fit: cover; }
+
+        /* TOP LIST (2-5) */
+        .top-list-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px; margin-bottom: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px; border: 1px solid #333;
             transition: 0.3s;
         }
-        .cat-item:hover {
-            background: var(--neon-cyan); color: #000; transform: scale(1.05);
-            box-shadow: 0 0 15px var(--neon-cyan);
+        .top-list-item:hover { border-color: var(--neon-cyan); background: rgba(102, 252, 241, 0.05); }
+        .rank-number {
+            width: 30px; height: 30px; border-radius: 50%; background: #333;
+            color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px;
         }
-        .cat-img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
-
-        /* Tin tức (News Grid) */
-        .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-        .news-card {
-            background: var(--bg-card); border: 1px solid #333; border-radius: 10px; overflow: hidden; transition: 0.3s;
-            display: flex; flex-direction: column; height: 100%;
-        }
-        .news-card:hover { border-color: var(--neon-pink); transform: translateY(-5px); }
-        .news-thumb { height: 180px; width: 100%; object-fit: cover; }
-        .news-body { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
-        .news-title { color: var(--neon-cyan); font-size: 16px; font-weight: bold; margin-bottom: 10px; }
-        .news-date { font-size: 12px; color: #888; margin-top: auto; }
-
-        /* Bootstrap override for dark mode consistency */
-        .carousel-indicators [data-bs-target] { background-color: var(--neon-cyan); }
+        /* Màu rank */
+        .rank-2 { background: #C0C0C0; color: #000; }
+        .rank-3 { background: #CD7F32; color: #000; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo">
-        <a href="/" style="text-decoration:none; color:#66fcf1;"><i class="fas fa-gift"></i> Mystery Box</a>
-    </div>
+    <div class="logo"><a href="/" style="text-decoration:none; color:#66fcf1;"><i class="fas fa-gift"></i> Mystery Box</a></div>
 
     <div class="search-bar">
         <form action="/" method="get">
@@ -74,25 +63,21 @@
 
     <div class="menu">
         <a href="/" class="nav-link active">🏠 Trang Chủ</a>
-        <a href="/cart" class="nav-link">🛒 Giỏ Hàng</a>
-        <a href="/inventory" class="nav-link">🎒 Kho Đồ</a>
+        <a href="/shop" class="nav-link">🛍️ Cửa Hàng</a>
         <a href="/deposit" class="nav-link deposit-btn">💎 Nạp Xu</a>
-
-        <a href="/admin" class="nav-link"
-           style="border: 1px solid #ff4757; color: #ff4757;"
-           th:if="${nxvUser != null and nxvUser.isAdmin}">🛠️ Quản Trị</a>
+        <a href="/admin" class="nav-link" style="border: 1px solid #ff4757; color: #ff4757;" th:if="${nxvUser != null and nxvUser.isAdmin}">🛠️ Quản Trị</a>
     </div>
 
     <div class="user-info" th:if="${nxvUser != null}">
-        <div class="user-details">
-            <a href="/profile" style="color: #fff; text-decoration: none; font-weight: 600;">
-                Hello, <span th:text="${nxvUser.fullName}" style="color: #66fcf1;">User</span>
-            </a>
-            <br>
-            <a href="/logout" class="logout-link">🚪 Đăng xuất</a>
-        </div>
-        <div class="wallet">
-            💰 <span th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span> đ
+        <div class="wallet me-3">💰 <span th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span></div>
+        <div class="user-dropdown">
+            <span class="fw-bold text-light me-2" th:text="${nxvUser.username}">User</span>
+            <img th:src="'https://ui-avatars.com/api/?background=random&color=fff&name=' + ${nxvUser.fullName}" class="user-avatar">
+            <div class="dropdown-menu-custom">
+                <a href="/profile" class="dropdown-item-custom"><i class="fas fa-id-card"></i> Hồ Sơ</a>
+                <a href="/inventory" class="dropdown-item-custom"><i class="fas fa-box-open"></i> Kho Đồ</a>
+                <a href="/logout" class="dropdown-item-custom" style="color: var(--neon-pink);"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a>
+            </div>
         </div>
     </div>
 
@@ -100,14 +85,6 @@
         <a href="/login" class="btn-buy" style="padding: 8px 20px; text-decoration: none; width: auto; margin: 0;">Đăng Nhập</a>
     </div>
 </header>
-
-<div th:if="${banners == null or banners.isEmpty()}" class="hero-banner">
-    <div class="hero-content">
-        <h1>SĂN GẤU BÔNG - THỬ VẬN MAY</h1>
-        <p>Mở hộp bí mật, sở hữu ngay những vật phẩm giới hạn cực hiếm!</p>
-        <button class="hero-btn" onclick="scrollToShop()">KHÁM PHÁ NGAY</button>
-    </div>
-</div>
 
 <div th:unless="${banners == null or banners.isEmpty()}" id="homeCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
     <div class="carousel-indicators">
@@ -120,40 +97,61 @@
                 <img th:src="${b.imageUrl}" class="d-block w-100" alt="Banner">
             </a>
             <div class="carousel-caption d-none d-md-block">
-                <h2 th:text="${b.title}" style="color: var(--neon-cyan); text-transform: uppercase; font-weight: 800;">Tiêu đề</h2>
+                <h2 th:text="${b.title}" style="color: var(--neon-cyan); text-transform: uppercase; font-weight: 800;">Tiêu Đề</h2>
                 <button class="hero-btn mt-2" onclick="scrollToShop()">Xem Ngay</button>
             </div>
         </div>
     </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#homeCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
-    </button>
+    <button class="carousel-control-prev" type="button" data-bs-target="#homeCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+    <button class="carousel-control-next" type="button" data-bs-target="#homeCarousel" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
 </div>
 
-<div class="container mb-5">
-    <h5 class="text-center text-light mb-3" style="letter-spacing: 2px;">DANH MỤC KHÁM PHÁ</h5>
-    <div class="category-bar">
-        <a href="/" class="cat-item">
-            <i class="fas fa-th-large"></i> Tất cả
-        </a>
-        <a th:each="cat : ${categories}" th:href="@{/(keyword=${cat.categoryName})}" class="cat-item">
-            <img th:if="${cat.imageUrl != null}" th:src="${cat.imageUrl}" class="cat-img">
-            <i th:if="${cat.imageUrl == null}" class="fas fa-cube"></i>
-            <span th:text="${cat.categoryName}">Anime</span>
-        </a>
+<div class="container mb-5" th:if="${topUsers != null and !topUsers.isEmpty()}">
+    <h3 class="section-title" style="color: #ffd700; border-bottom-color: #ffd700; text-shadow: 0 0 10px #ffd700;">
+        <i class="fas fa-crown"></i> BẢNG XẾP HẠNG ĐẠI GIA
+    </h3>
+
+    <div class="row align-items-center">
+        <div class="col-md-5 mb-4 mb-md-0" th:if="${topUsers.size() > 0}">
+            <div class="top1-card">
+                <div class="crown-icon"><i class="fas fa-crown"></i></div>
+                <img th:src="'https://ui-avatars.com/api/?size=200&background=random&color=fff&name=' + ${topUsers[0].user.fullName}" class="top1-avatar mb-3">
+                <h2 class="text-white fw-bold" th:text="${topUsers[0].user.username}">King</h2>
+                <div class="badge bg-warning text-dark fs-5 mt-2">TOP 1 SERVER</div>
+                <h3 class="mt-3" style="color: #ffd700; text-shadow: 0 0 10px #ffd700;">
+                    <span th:text="${#numbers.formatDecimal(topUsers[0].totalAmount, 0, 'COMMA', 0, 'POINT')}">0</span> đ
+                </h3>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="list-group">
+                <div th:each="top, iter : ${topUsers}" th:if="${iter.index > 0}" class="top-list-item">
+                    <div class="d-flex align-items-center">
+                        <div class="rank-number"
+                             th:classappend="${iter.index == 1} ? 'rank-2' : (${iter.index == 2} ? 'rank-3' : '')"
+                             th:text="${iter.count}">2</div>
+
+                        <img th:src="'https://ui-avatars.com/api/?background=random&color=fff&name=' + ${top.user.fullName}"
+                             class="rounded-circle me-3" width="40" height="40">
+
+                        <div>
+                            <div class="fw-bold text-light" th:text="${top.user.username}">User</div>
+                            <small class="text-muted">Đại gia ngầm</small>
+                        </div>
+                    </div>
+
+                    <div class="fw-bold text-info">
+                        <span th:text="${#numbers.formatDecimal(top.totalAmount, 0, 'COMMA', 0, 'POINT')}">0</span> đ
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <div class="container" id="shop-section">
     <h2 class="section-title">🔥 HỘP MÙ ĐANG HOT 🔥</h2>
-
-    <div th:if="${boxes.isEmpty()}" style="text-align: center; margin-top: 50px; color: #888;">
-        <h2>🔍 Không tìm thấy sản phẩm nào!</h2>
-        <a href="/" class="btn-buy" style="margin-top: 20px; display: inline-block; width: auto; padding: 10px 30px;">Về xem tất cả</a>
-    </div>
 
     <div class="box-grid">
         <div class="box-card" th:each="box : ${boxes}">
@@ -163,15 +161,13 @@
                 </a>
                 <span class="hot-badge" th:if="${box.isActive}">HOT</span>
             </div>
+
             <div class="box-info">
                 <a th:href="@{/box/{id}(id=${box.boxId})}" style="text-decoration: none;">
                     <h3 th:text="${box.boxName}">Tên Hộp</h3>
                 </a>
 
-                <small style="color: #888; display: block; margin-bottom: 5px;"
-                       th:text="${box.nxvCategory != null ? box.nxvCategory.categoryName : 'Mystery'}"></small>
-
-                <p class="price-tag" th:text="${#numbers.formatDecimal(box.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">100.000 đ</p>
+                <div class="price-tag" th:text="${#numbers.formatDecimal(box.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">100.000 đ</div>
 
                 <div class="action-buttons">
                     <button class="btn-buy" th:onclick="'openBox(' + ${box.boxId} + ')'"><i class="fas fa-magic"></i> MỞ NGAY</button>
@@ -183,16 +179,12 @@
 </div>
 
 <div class="container mt-5 pt-5" th:if="${newsList != null and !newsList.isEmpty()}">
-    <h2 class="section-title" style="border-color: var(--neon-pink); color: var(--neon-pink);">📰 TIN TỨC & SỰ KIỆN</h2>
-
+    <h2 class="section-title" style="border-color: var(--neon-pink); color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink);">📰 TIN TỨC & SỰ KIỆN</h2>
     <div class="news-grid">
         <div class="news-card" th:each="news : ${newsList}">
             <img th:src="${news.thumbnail}" class="news-thumb">
             <div class="news-body">
                 <div class="news-title" th:text="${news.title}">Tiêu đề tin tức</div>
-                <p style="font-size: 13px; color: #ccc;"
-                   th:text="${#strings.abbreviate(news.content, 80)}">Nội dung tóm tắt...</p>
-
                 <div class="d-flex justify-content-between align-items-center mt-auto">
                     <span class="news-date"><i class="far fa-clock"></i> <span th:text="${#temporals.format(news.publishedAt, 'dd/MM/yyyy')}"></span></span>
                     <a th:href="@{/news/{id}(id=${news.newsId})}" style="color: var(--neon-cyan); font-size: 13px; font-weight: bold;">Xem thêm &rarr;</a>
@@ -214,87 +206,48 @@
         document.getElementById('shop-section').scrollIntoView({behavior: 'smooth'});
     }
 
-    // --- HÀM MỞ HỘP (GACHA) ---
+    // --- LOGIC MỞ HỘP ---
     function openBox(boxId) {
+        // ... (Logic cũ giữ nguyên) ...
         const userId = [[${nxvUser != null ? nxvUser.userId : 'null'}]];
-
-        if (userId === 'null' || userId === null) {
-            promptLogin();
-            return;
-        }
+        if (userId === 'null') { promptLogin(); return; }
 
         Swal.fire({
             title: 'Đang mở hộp...',
-            html: 'Chờ xíu nhé, đang cầu nguyện nhân phẩm! 🙏',
+            html: 'Chờ xíu nhé...',
             timerProgressBar: true,
+            background: '#111', color: '#fff',
             didOpen: () => { Swal.showLoading() }
         });
 
         fetch(`/api/blindbox/open?userId=${userId}&boxId=${boxId}`, { method: 'POST' })
-        .then(res => {
-            if (!res.ok) throw new Error("Tiền không đủ hoặc lỗi mạng");
-            return res.json();
-        })
+        .then(res => { if (!res.ok) throw new Error("Lỗi"); return res.json(); })
         .then(data => showResult(data))
-        .catch(() => Swal.fire('Lỗi!', 'Bạn không đủ tiền hoặc có lỗi xảy ra.', 'error'));
+        .catch(() => Swal.fire({icon: 'error', title: 'Lỗi', text: 'Số dư không đủ!', background: '#111', color: '#fff'}));
     }
 
-    // --- HÀM THÊM GIỎ HÀNG ---
     function addToCart(boxId) {
         const userId = [[${nxvUser != null ? nxvUser.userId : 'null'}]];
-        if (userId === 'null' || userId === null) { promptLogin(); return; }
+        if (userId === 'null') { promptLogin(); return; }
 
         fetch(`/api/cart/add?userId=${userId}&boxId=${boxId}`, { method: 'POST' })
         .then(res => {
-            if(res.ok) {
-                const Toast = Swal.mixin({
-                    toast: true, position: 'top-end', showConfirmButton: false, timer: 2000,
-                    didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer);
-                        toast.addEventListener('mouseleave', Swal.resumeTimer);
-                    }
-                })
-                Toast.fire({ icon: 'success', title: 'Đã thêm vào giỏ!' })
-            } else {
-                Swal.fire('Lỗi', 'Không thể thêm vào giỏ', 'error');
-            }
+            if(res.ok) Swal.fire({ icon: 'success', title: 'Đã thêm vào giỏ!', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#111', color: '#fff' });
         });
     }
 
-    // --- HIỂN THỊ KẾT QUẢ ---
     function showResult(data) {
-        let titleColor = '#000';
-        if(data.rarity === 'S') titleColor = '#ffd700';
-        else if(data.rarity === 'A') titleColor = '#ff4757';
-        else if(data.rarity === 'B') titleColor = '#9b59b6';
-        else if(data.rarity === 'C') titleColor = '#3498db';
-
+        let color = data.rarity === 'S' ? '#ffd700' : (data.rarity === 'A' ? '#ff4757' : '#fff');
         Swal.fire({
-            title: `<span style="color:${titleColor}">🎉 BẠN TRÚNG: ${data.rarity} 🎉</span>`,
-            html: `
-                <div style="text-align:center">
-                    <img src="${data.itemImage}" style="width:150px; margin:10px auto; border-radius:10px; box-shadow:0 0 15px ${titleColor}">
-                    <h3>${data.itemName}</h3>
-                    <p>Số dư còn lại: <b>${new Intl.NumberFormat().format(data.currentBalance)} đ</b></p>
-                    <a href="/inventory" class="btn btn-sm btn-outline-primary mt-2">Xem kho đồ</a>
-                </div>
-            `,
-            confirmButtonText: 'Tuyệt vời!',
-            background: '#fff'
+            title: `<span style="color:${color}">🎉 BẠN TRÚNG: ${data.rarity} 🎉</span>`,
+            html: `<img src="${data.itemImage}" style="width:120px; margin:10px auto; border:2px solid ${color}; border-radius:10px;"><h3>${data.itemName}</h3>`,
+            background: '#111', color: '#fff'
         });
-        // Không reload để user tiếp tục mua nếu muốn
     }
 
     function promptLogin() {
-        Swal.fire({
-            title: 'Chưa đăng nhập!',
-            text: 'Vui lòng đăng nhập để tiếp tục.',
-            icon: 'warning',
-            confirmButtonText: 'Đăng nhập ngay'
-        })
-        .then((res) => {
-            if(res.isConfirmed) window.location.href='/login';
-        });
+        Swal.fire({ title: 'Chưa Đăng Nhập!', icon: 'warning', confirmButtonText: 'Đăng Nhập', background: '#111', color: '#fff' })
+        .then((res) => { if(res.isConfirmed) window.location.href='/login'; });
     }
 </script>
 </body>
