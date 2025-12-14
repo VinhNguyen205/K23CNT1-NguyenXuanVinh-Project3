@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Gửi Yêu Cầu Ship Đồ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <a href="/" style="text-decoration:none; color:#66fcf1;">
+            <i class="fas fa-gift"></i> Mystery Box
+        </a>
+    </div>
+
+    <div class="menu">
+        <a href="/" class="nav-link">🏠 Trang Chủ</a>
+        <a href="/cart" class="nav-link" th:classappend="${currentPage == 'cart'} ? 'active'">🛍️ Giỏ Hàng</a>
+        <a href="/inventory" class="nav-link" th:classappend="${currentPage == 'inventory'} ? 'active'">🎒 Kho Đồ</a>
+        <a href="/deposit" class="nav-link deposit-btn">💎 Nạp Xu</a>
+
+        <a href="/admin" class="nav-link admin-btn" th:if="${nxvUser != null and nxvUser.isAdmin}">🛠️ Quản Trị</a>
+    </div>
+
+    <div class="user-info" th:if="${nxvUser != null}">
+        <div class="wallet me-3">
+            💰 <span id="wallet-balance" th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span>
+        </div>
+
+        <div class="user-dropdown">
+            <span class="fw-bold text-light me-2" th:text="${nxvUser.username}">User</span>
+            <img th:src="'https://ui-avatars.com/api/?background=random&color=fff&name=' + ${nxvUser.fullName}" class="user-avatar">
+
+            <div class="dropdown-menu-custom">
+                <div style="padding: 10px 20px; border-bottom: 1px solid #333; color: #aaa; font-size: 12px;">
+                    Xin chào, <b style="color: #fff;" th:text="${nxvUser.fullName}">Name</b>
+                </div>
+                <a href="/profile" class="dropdown-item-custom"><i class="fas fa-id-card"></i> Hồ Sơ Cá Nhân</a>
+                <a href="/shipment/history" class="dropdown-item-custom"><i class="fas fa-history"></i> Lịch Sử Giao Hàng</a>
+                <a href="/logout" class="dropdown-item-custom" style="color: #ff4757;"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="user-info" th:if="${nxvUser == null}">
+        <a href="/login" class="btn-buy" style="padding: 8px 20px; text-decoration: none; width: auto; margin: 0;">Đăng Nhập</a>
+    </div>
+</header>
+
+<div class="container mt-5">
+
+    <h2 class="section-title">📦 TẠO ĐƠN VẬN CHUYỂN</h2>
+
+    <div th:if="${error}" class="alert alert-danger text-center" th:text="${error}"></div>
+
+    <form action="/shipment/submit" method="post" class="shipment-layout">
+
+        <div class="ship-info-card">
+            <h5><i class="fas fa-map-marker-alt"></i> Thông Tin Nhận Hàng</h5>
+
+            <label>Họ tên người nhận:</label>
+            <input type="text" name="receiverName" class="ship-input" required th:value="${nxvUser.fullName}">
+
+            <label>Số điện thoại:</label>
+            <input type="text" name="phoneNumber" class="ship-input" required th:value="${nxvUser.phoneNumber}">
+
+            <label>Địa chỉ giao hàng:</label>
+            <textarea name="address" class="ship-input" rows="3" required th:text="${nxvUser.address}"></textarea>
+
+            <label>Ghi chú (Tùy chọn):</label>
+            <textarea name="note" class="ship-input" rows="2" placeholder="VD: Giao giờ hành chính..."></textarea>
+
+            <div class="shipping-fee-box">
+                <i class="fas fa-coins"></i> Phí vận chuyển cố định:
+                <b>20,000 đ</b>
+                <span>(Sẽ trừ vào ví của bạn)</span>
+            </div>
+        </div>
+
+        <div class="select-item-container">
+            <h5 class="text-info mb-4" style="border-bottom: 1px solid #444; padding-bottom: 10px;">
+                <i class="fas fa-check-double"></i> Chọn vật phẩm muốn Ship về:
+            </h5>
+
+            <div th:if="${items.isEmpty()}" class="text-center text-muted py-5">
+                <h4>Kho trống trơn! 🕸️</h4>
+                <p>Bạn chưa có món đồ nào trong kho để ship.</p>
+            </div>
+
+            <div class="select-item-grid">
+                <div th:each="item : ${items}" class="select-card" onclick="toggleCheck(this)">
+                    <input type="checkbox" name="selectedItems" th:value="${item.inventoryId}" onclick="event.stopPropagation()">
+
+                    <span class="badge"
+                          th:classappend="'rank-' + ${item.boxItem.rarityLevel}"
+                          th:text="${item.boxItem.rarityLevel}">S</span>
+
+                    <img th:src="${item.boxItem.imageUrl}" alt="Item">
+                    <h4 th:text="${item.boxItem.itemName}">Tên Item</h4>
+                </div>
+            </div>
+
+            <div class="ship-actions">
+                <a href="/inventory" class="btn btn-outline-light px-4">Hủy bỏ</a>
+                <button type="submit" class="btn-ship-confirm">
+                    <i class="fas fa-paper-plane"></i> XÁC NHẬN GỬI ĐƠN
+                </button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    function toggleCheck(card) {
+        const checkbox = card.querySelector('input[type="checkbox"]');
+        checkbox.checked = !checkbox.checked;
+        if(checkbox.checked) {
+            card.classList.add('active');
+        } else {
+            card.classList.remove('active');
+        }
+    }
+
+    // Đồng bộ class active khi load trang (nếu browser lưu cache form)
+    document.querySelectorAll('.select-card input').forEach(input => {
+        input.addEventListener('change', function() {
+            const card = this.closest('.select-card');
+            if(this.checked) card.classList.add('active');
+            else card.classList.remove('active');
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -9,14 +9,43 @@
 </head>
 <body>
 <header>
-    <div class="logo"><a href="/" style="text-decoration:none; color:#66fcf1;"><i class="fas fa-gift"></i> Mystery Box</a></div>
+    <div class="logo">
+        <a href="/" style="text-decoration:none; color:#66fcf1;">
+            <i class="fas fa-gift"></i> Mystery Box
+        </a>
+    </div>
+
     <div class="menu">
         <a href="/" class="nav-link">🏠 Trang Chủ</a>
-        <a href="/cart" class="nav-link active">🛒 Giỏ Hàng</a>
-        <a href="/inventory" class="nav-link">🎒 Kho Đồ</a>
+        <a href="/cart" class="nav-link" th:classappend="${currentPage == 'cart'} ? 'active'">🛍️ Giỏ Hàng</a>
+        <a href="/inventory" class="nav-link" th:classappend="${currentPage == 'inventory'} ? 'active'">🎒 Kho Đồ</a>
+        <a href="/deposit" class="nav-link deposit-btn">💎 Nạp Xu</a>
+
+        <a href="/admin" class="nav-link admin-btn" th:if="${nxvUser != null and nxvUser.isAdmin}">🛠️ Quản Trị</a>
     </div>
+
     <div class="user-info" th:if="${nxvUser != null}">
-        <span><b th:text="${nxvUser.fullName}">User</b></span>
+        <div class="wallet me-3">
+            💰 <span id="wallet-balance" th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span>
+        </div>
+
+        <div class="user-dropdown">
+            <span class="fw-bold text-light me-2" th:text="${nxvUser.username}">User</span>
+            <img th:src="'https://ui-avatars.com/api/?background=random&color=fff&name=' + ${nxvUser.fullName}" class="user-avatar">
+
+            <div class="dropdown-menu-custom">
+                <div style="padding: 10px 20px; border-bottom: 1px solid #333; color: #aaa; font-size: 12px;">
+                    Xin chào, <b style="color: #fff;" th:text="${nxvUser.fullName}">Name</b>
+                </div>
+                <a href="/profile" class="dropdown-item-custom"><i class="fas fa-id-card"></i> Hồ Sơ Cá Nhân</a>
+                <a href="/shipment/history" class="dropdown-item-custom"><i class="fas fa-history"></i> Lịch Sử Giao Hàng</a>
+                <a href="/logout" class="dropdown-item-custom" style="color: #ff4757;"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="user-info" th:if="${nxvUser == null}">
+        <a href="/login" class="btn-buy" style="padding: 8px 20px; text-decoration: none; width: auto; margin: 0;">Đăng Nhập</a>
     </div>
 </header>
 

@@ -13,7 +13,7 @@
         .nxvOrder-card { flex: 2; min-width: 400px; }
 
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; color: #66fcf1; margin-bottom: 8px; font-weight: 600; }
+        .form-group label { display: block; color: #66fcf1; margin-bottom: 8px; font-weight: 600; text-transform: capitalize; }
         .form-control { width: 100%; padding: 12px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 5px; outline: none; transition: 0.3s; }
         .form-control:focus { box-shadow: 0 0 10px rgba(102, 252, 241, 0.5); border-color: #66fcf1; }
         .form-control:disabled { background: #14141a; color: #888; border-color: #333; cursor: not-allowed; }
@@ -33,28 +33,42 @@
 
 <header>
     <div class="logo">
-        <a href="/" style="text-decoration:none; color:#66fcf1;"><i class="fas fa-gift"></i> Mystery Box</a>
+        <a href="/" style="text-decoration:none; color:#66fcf1;">
+            <i class="fas fa-gift"></i> Mystery Box
+        </a>
     </div>
 
     <div class="menu">
         <a href="/" class="nav-link">🏠 Trang Chủ</a>
-        <a href="/cart" class="nav-link">🛒 Giỏ Hàng</a>
-        <a href="/inventory" class="nav-link">🎒 Kho Đồ</a>
+        <a href="/cart" class="nav-link" th:classappend="${currentPage == 'cart'} ? 'active'">🛍️ Giỏ Hàng</a>
+        <a href="/inventory" class="nav-link" th:classappend="${currentPage == 'inventory'} ? 'active'">🎒 Kho Đồ</a>
         <a href="/deposit" class="nav-link deposit-btn">💎 Nạp Xu</a>
+
         <a href="/admin" class="nav-link admin-btn" th:if="${nxvUser != null and nxvUser.isAdmin}">🛠️ Quản Trị</a>
     </div>
 
     <div class="user-info" th:if="${nxvUser != null}">
-        <div class="user-details">
-            <a href="/profile" style="color: #66fcf1; text-decoration: none; font-weight: 600;">
-                Xin chào, <span th:text="${nxvUser.fullName}">User</span>
-            </a>
-            <br>
-            <a href="/logout" class="logout-link">🚪 Đăng xuất</a>
+        <div class="wallet me-3">
+            💰 <span id="wallet-balance" th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span>
         </div>
-        <div class="wallet">
-            💰 <span th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span> VNĐ
+
+        <div class="user-dropdown">
+            <span class="fw-bold text-light me-2" th:text="${nxvUser.username}">User</span>
+            <img th:src="'https://ui-avatars.com/api/?background=random&color=fff&name=' + ${nxvUser.fullName}" class="user-avatar">
+
+            <div class="dropdown-menu-custom">
+                <div style="padding: 10px 20px; border-bottom: 1px solid #333; color: #aaa; font-size: 12px;">
+                    Xin chào, <b style="color: #fff;" th:text="${nxvUser.fullName}">Name</b>
+                </div>
+                <a href="/profile" class="dropdown-item-custom"><i class="fas fa-id-card"></i> Hồ Sơ Cá Nhân</a>
+                <a href="/shipment/history" class="dropdown-item-custom"><i class="fas fa-history"></i> Lịch Sử Giao Hàng</a>
+                <a href="/logout" class="dropdown-item-custom" style="color: #ff4757;"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a>
+            </div>
         </div>
+    </div>
+
+    <div class="user-info" th:if="${nxvUser == null}">
+        <a href="/login" class="btn-buy" style="padding: 8px 20px; text-decoration: none; width: auto; margin: 0;">Đăng Nhập</a>
     </div>
 </header>
 
@@ -68,11 +82,11 @@
             <form id="profileForm">
                 <input type="hidden" id="userId" th:value="${nxvUser.userId}">
                 <div class="form-group">
-                    <label>Tên đăng nhập</label>
+                    <label>Tên Đăng Nhập</label>
                     <input type="text" class="form-control" th:value="${nxvUser.username}" disabled>
                 </div>
                 <div class="form-group">
-                    <label>Họ và tên</label>
+                    <label>Họ Và Tên</label>
                     <input type="text" id="fullName" class="form-control" th:value="${nxvUser.fullName}">
                 </div>
                 <div class="form-group">
@@ -80,11 +94,11 @@
                     <input type="email" id="email" class="form-control" th:value="${nxvUser.email}">
                 </div>
                 <div class="form-group">
-                    <label>Số điện thoại</label>
+                    <label>Số Điện Thoại</label>
                     <input type="text" id="phone" class="form-control" th:value="${nxvUser.phoneNumber != null ? nxvUser.phoneNumber : ''}" placeholder="Nhập SĐT...">
                 </div>
                 <div class="form-group">
-                    <label>Địa chỉ giao hàng</label>
+                    <label>Địa Chỉ Giao Hàng</label>
                     <input type="text" id="address" class="form-control" th:value="${nxvUser.address != null ? nxvUser.address : ''}" placeholder="Nhập địa chỉ...">
                 </div>
 
@@ -102,22 +116,22 @@
             <div th:if="${orders.isEmpty()}" style="text-align: center; color: #888; margin-top: 50px;">
                 <i class="fas fa-box-open fa-3x" style="margin-bottom: 20px; color: #2a2a40;"></i>
                 <p>Bạn chưa mua đơn hàng nào.</p>
-                <a href="/" class="btn-buy" style="display:inline-block; width:auto; margin-top:10px; padding:8px 20px;">Mua sắm ngay</a>
+                <a href="/" class="btn-buy" style="display:inline-block; width:auto; margin-top:10px; padding:8px 20px;">Mua Sắm Ngay</a>
             </div>
 
             <table th:unless="${orders.isEmpty()}">
                 <thead>
                 <tr>
                     <th>Mã Đơn</th>
-                    <th>Ngày đặt</th>
-                    <th>Tổng tiền</th>
-                    <th>Trạng thái</th>
-                    <th>Chi tiết</th>
+                    <th>Ngày Đặt</th>
+                    <th>Tổng Tiền</th>
+                    <th>Trạng Thái</th>
+                    <th>Chi Tiết</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="order : ${orders}">
-                    <td style="color: #fff; font-weight: bold;" th:text="'#' + ${order.orderId}">#1</td>
+                    <td style="color: #fff; font-weight: bold;" th:text="'#' + ${order.id}">#1</td>
                     <td th:text="${#temporals.format(order.orderDate, 'dd-MM-yyyy HH:mm')}">01-01-2025</td>
                     <td style="color: #ffd700; font-weight: bold;" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'">100.000 đ</td>
                     <td>
@@ -147,7 +161,6 @@
         const phone = document.getElementById('phone').value;
         const address = document.getElementById('address').value;
 
-        // Sửa URL API cho đúng: /api/user/update
         fetch(`/api/user/update`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -161,10 +174,10 @@
         })
         .then(async response => {
             if (response.ok) {
-                const text = await response.text(); // Đọc phản hồi text từ API
+                const text = await response.text();
                 Swal.fire({
-                    title: 'Thành công',
-                    text: text, // "Cập nhật thành công!"
+                    title: 'Thành Công',
+                    text: text,
                     icon: 'success',
                     background: '#1f2833', color: '#fff'
                 }).then(() => location.reload());

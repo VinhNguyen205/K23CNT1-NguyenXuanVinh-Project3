@@ -8,7 +8,4 @@ import java.util.List;
 
 @Repository
 public interface nxvShipmentDetailRepository extends JpaRepository<nxvShipmentDetail, Integer> {
-    // Trong Entity: private nxvShipmentRequest nxvShipmentRequest;
-    // -> Method: findByNxvShipmentRequest
-    List<nxvShipmentDetail> findByNxvShipmentRequest(nxvShipmentRequest nxvShipmentRequest);
-}
+    List<nxvShipmentDetail> findByShipmentRequest(nxvShipmentRequest shipmentRequest);}
