@@ -9,9 +9,7 @@ import java.util.List;
 
 @Repository
 public interface nxvBoxItemRepository extends JpaRepository<nxvBoxItem, Integer> {
-
     List<nxvBoxItem> findByBlindBox(nxvBlindBox blindBox);
 
-    @Query("SELECT i FROM nxvBoxItem i WHERE i.stockQuantity < 10")
-    List<nxvBoxItem> findLowStockItems();
+    List<nxvBoxItem> findByStockQuantityLessThanOrderByStockQuantityAsc(Integer stockLimit);
 }

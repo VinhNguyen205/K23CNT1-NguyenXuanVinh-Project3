@@ -382,3 +382,81 @@ INSERT INTO BoxItems (BoxID, ItemName, RarityLevel, Probability, StockQuantity, 
 PRINT N'=== KHỞI TẠO DATABASE HOÀN TẤT ===';
 PRINT N'Hãy đảm bảo file ảnh trong src/main/resources/static/images khớp chính xác đuôi (.jpg, .webp, .png) như trong code!';
 GO
+
+use BlindBoxDB;
+-- Cập nhật giá cho 4 Box đầu tiên (BoxID 1, 2, 3, 4)
+
+-- Hộp 1: Hộp Thường (Tăng lên 150k)
+UPDATE BlindBoxes 
+SET Price = 150000 
+WHERE BoxID = 1;
+
+-- Hộp 2: Hộp Hiếm (Tăng lên 500k)
+UPDATE BlindBoxes 
+SET Price = 200000 
+WHERE BoxID = 2;
+
+-- Hộp 3: Hộp Sử Thi (Tăng lên 1 triệu)
+UPDATE BlindBoxes 
+SET Price = 175000 
+WHERE BoxID = 3;
+
+-- Hộp 4: Hộp Huyền Thoại (Tăng lên 2.5 triệu - Cho đại gia mở)
+UPDATE BlindBoxes 
+SET Price = 150000 
+WHERE BoxID = 4;
+
+USE BlindBoxDB; -- Thay tên DB của bạn vào đây nếu cần
+GO
+
+-- 1. Thêm ReceiverName (Nếu chưa có)
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'ReceiverName' AND Object_ID = Object_ID(N'Orders'))
+BEGIN
+    ALTER TABLE Orders ADD ReceiverName NVARCHAR(255);
+    PRINT 'Da them cot ReceiverName';
+END
+
+-- 2. Thêm PhoneNumber
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'PhoneNumber' AND Object_ID = Object_ID(N'Orders'))
+BEGIN
+    ALTER TABLE Orders ADD PhoneNumber VARCHAR(20);
+    PRINT 'Da them cot PhoneNumber';
+END
+
+-- 3. Thêm ShippingAddress
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'ShippingAddress' AND Object_ID = Object_ID(N'Orders'))
+BEGIN
+    ALTER TABLE Orders ADD ShippingAddress NVARCHAR(MAX);
+    PRINT 'Da them cot ShippingAddress';
+END
+
+-- 4. Thêm OrderStatus
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'OrderStatus' AND Object_ID = Object_ID(N'Orders'))
+BEGIN
+    ALTER TABLE Orders ADD OrderStatus VARCHAR(50);
+    PRINT 'Da them cot OrderStatus';
+END
+
+-- 5. Thêm PaymentMethod
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'PaymentMethod' AND Object_ID = Object_ID(N'Orders'))
+BEGIN
+    ALTER TABLE Orders ADD PaymentMethod VARCHAR(50);
+    PRINT 'Da them cot PaymentMethod';
+END
+
+-- 6. Thêm PaymentStatus
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'PaymentStatus' AND Object_ID = Object_ID(N'Orders'))
+BEGIN
+    ALTER TABLE Orders ADD PaymentStatus VARCHAR(50);
+    PRINT 'Da them cot PaymentStatus';
+END
+
+-- 7. Thêm DeliveryDate
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'DeliveryDate' AND Object_ID = Object_ID(N'Orders'))
+BEGIN
+    ALTER TABLE Orders ADD DeliveryDate DATETIME;
+    PRINT 'Da them cot DeliveryDate';
+END
+
+PRINT '--- CAP NHAT HOAN TAT ---';
+GO

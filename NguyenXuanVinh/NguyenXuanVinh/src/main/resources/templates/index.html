@@ -12,39 +12,31 @@
         /* CSS Riêng cho trang chủ */
         .carousel-item { height: 500px; background-color: #000; }
         .carousel-item img { height: 100%; object-fit: cover; opacity: 0.8; }
-
         .carousel-caption {
             background: rgba(0, 0, 0, 0.6); padding: 20px; border-radius: 10px;
             border: 1px solid var(--neon-cyan); box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
         }
 
-        /* TOP 1 USER CARD */
+        /* Top User Card */
         .top1-card {
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(0,0,0,0.8));
-            border: 2px solid #ffd700;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+            border: 2px solid #ffd700; border-radius: 15px; padding: 20px;
+            text-align: center; position: relative; box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
         }
         .crown-icon { font-size: 40px; color: #ffd700; margin-bottom: 10px; filter: drop-shadow(0 0 10px #ffd700); }
         .top1-avatar { width: 100px; height: 100px; border: 3px solid #ffd700; border-radius: 50%; object-fit: cover; }
 
-        /* TOP LIST (2-5) */
+        /* Top List */
         .top-list-item {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 12px; margin-bottom: 10px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px; border: 1px solid #333;
-            transition: 0.3s;
+            padding: 12px; margin-bottom: 10px; background: rgba(255,255,255,0.05);
+            border-radius: 10px; border: 1px solid #333; transition: 0.3s;
         }
         .top-list-item:hover { border-color: var(--neon-cyan); background: rgba(102, 252, 241, 0.05); }
         .rank-number {
             width: 30px; height: 30px; border-radius: 50%; background: #333;
             color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 15px;
         }
-        /* Màu rank */
         .rank-2 { background: #C0C0C0; color: #000; }
         .rank-3 { background: #CD7F32; color: #000; }
     </style>
@@ -52,7 +44,9 @@
 <body>
 
 <header>
-    <div class="logo"><a href="/" style="text-decoration:none; color:#66fcf1;"><i class="fas fa-gift"></i> Mystery Box</a></div>
+    <div class="logo">
+        <a href="/" style="text-decoration:none; color:#66fcf1;"><i class="fas fa-gift"></i> Mystery Box</a>
+    </div>
 
     <div class="search-bar">
         <form action="/" method="get">
@@ -63,26 +57,39 @@
 
     <div class="menu">
         <a href="/" class="nav-link active">🏠 Trang Chủ</a>
-        <a href="/cart" class="nav-link">🛍️ Giỏ Hàng</a>
+        <a href="/cart" class="nav-link">🛒 Giỏ Hàng</a>
+        <a href="/inventory" class="nav-link">🎒 Kho Đồ</a>
         <a href="/deposit" class="nav-link deposit-btn">💎 Nạp Xu</a>
-        <a href="/admin" class="nav-link" style="border: 1px solid #ff4757; color: #ff4757;" th:if="${nxvUser != null and nxvUser.isAdmin}">🛠️ Quản Trị</a>
+        <a href="/admin" class="nav-link admin-btn" th:if="${nxvUser != null and nxvUser.isAdmin}">🛠️ Quản Trị</a>
     </div>
 
-    <div class="user-info" th:if="${nxvUser != null}">
-        <div class="wallet me-3">💰 <span th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span></div>
-        <div class="user-dropdown">
-            <span class="fw-bold text-light me-2" th:text="${nxvUser.username}">User</span>
-            <img th:src="'https://ui-avatars.com/api/?background=random&color=fff&name=' + ${nxvUser.fullName}" class="user-avatar">
+    <div class="user-info d-flex align-items-center" th:if="${nxvUser != null}">
+        <div class="wallet-badge me-3" title="Số Dư Hiện Tại">
+            <i class="fas fa-coins wallet-icon"></i>
+            <span id="wallet-balance" class="wallet-amount" th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span>
+            <small class="currency">đ</small>
+        </div>
+
+        <div class="user-dropdown-container">
+            <div class="user-trigger">
+                <span class="username d-none d-lg-inline me-2" th:text="${nxvUser.username}">User</span>
+                <img th:src="'https://ui-avatars.com/api/?background=random&color=fff&name=' + ${nxvUser.fullName}" class="user-avatar-glow">
+            </div>
+
             <div class="dropdown-menu-custom">
-                <a href="/profile" class="dropdown-item-custom"><i class="fas fa-id-card"></i> Hồ Sơ</a>
+                <div class="dropdown-header-info">
+                    Xin chào, <b th:text="${nxvUser.fullName}" style="color: #fff;">Name</b>
+                </div>
+                <a href="/profile" class="dropdown-item-custom"><i class="fas fa-id-card"></i> Hồ Sơ Cá Nhân</a>
                 <a href="/inventory" class="dropdown-item-custom"><i class="fas fa-box-open"></i> Kho Đồ</a>
-                <a href="/logout" class="dropdown-item-custom" style="color: var(--neon-pink);"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a>
+                <a href="/shipment/history" class="dropdown-item-custom"><i class="fas fa-history"></i> Lịch Sử Giao Dịch</a>
+                <a href="/logout" class="dropdown-item-custom logout"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a>
             </div>
         </div>
     </div>
 
     <div class="user-info" th:if="${nxvUser == null}">
-        <a href="/login" class="btn-buy" style="padding: 8px 20px; text-decoration: none; width: auto; margin: 0;">Đăng Nhập</a>
+        <a href="/login" class="btn-buy" style="padding: 8px 25px; text-decoration: none; display: inline-block;">Đăng Nhập</a>
     </div>
 </header>
 
@@ -110,7 +117,6 @@
     <h3 class="section-title" style="color: #ffd700; border-bottom-color: #ffd700; text-shadow: 0 0 10px #ffd700;">
         <i class="fas fa-crown"></i> BẢNG XẾP HẠNG ĐẠI GIA
     </h3>
-
     <div class="row align-items-center">
         <div class="col-md-5 mb-4 mb-md-0" th:if="${topUsers.size() > 0}">
             <div class="top1-card">
@@ -123,7 +129,6 @@
                 </h3>
             </div>
         </div>
-
         <div class="col-md-7">
             <div class="list-group">
                 <div th:each="top, iter : ${topUsers}" th:if="${iter.index > 0}" class="top-list-item">
@@ -131,16 +136,13 @@
                         <div class="rank-number"
                              th:classappend="${iter.index == 1} ? 'rank-2' : (${iter.index == 2} ? 'rank-3' : '')"
                              th:text="${iter.count}">2</div>
-
                         <img th:src="'https://ui-avatars.com/api/?background=random&color=fff&name=' + ${top.user.fullName}"
                              class="rounded-circle me-3" width="40" height="40">
-
                         <div>
                             <div class="fw-bold text-light" th:text="${top.user.username}">User</div>
                             <small class="text-muted">Đại gia ngầm</small>
                         </div>
                     </div>
-
                     <div class="fw-bold text-info">
                         <span th:text="${#numbers.formatDecimal(top.totalAmount, 0, 'COMMA', 0, 'POINT')}">0</span> đ
                     </div>
@@ -152,7 +154,6 @@
 
 <div class="container" id="shop-section">
     <h2 class="section-title">🔥 HỘP MÙ ĐANG HOT 🔥</h2>
-
     <div class="box-grid">
         <div class="box-card" th:each="box : ${boxes}">
             <div class="box-image">
@@ -161,14 +162,11 @@
                 </a>
                 <span class="hot-badge" th:if="${box.isActive}">HOT</span>
             </div>
-
             <div class="box-info">
                 <a th:href="@{/box/{id}(id=${box.boxId})}" style="text-decoration: none;">
                     <h3 th:text="${box.boxName}">Tên Hộp</h3>
                 </a>
-
                 <div class="price-tag" th:text="${#numbers.formatDecimal(box.price, 0, 'COMMA', 0, 'POINT')} + ' đ'">100.000 đ</div>
-
                 <div class="action-buttons">
                     <button class="btn-buy" th:onclick="'openBox(' + ${box.boxId} + ')'"><i class="fas fa-magic"></i> MỞ NGAY</button>
                     <button class="btn-cart" th:onclick="'addToCart(' + ${box.boxId} + ')'"><i class="fas fa-cart-plus"></i></button>
@@ -206,24 +204,39 @@
         document.getElementById('shop-section').scrollIntoView({behavior: 'smooth'});
     }
 
-    // --- LOGIC MỞ HỘP ---
+    // --- LOGIC MỞ HỘP (ĐỆ QUY) ---
     function openBox(boxId) {
-        // ... (Logic cũ giữ nguyên) ...
+        // Lấy userId từ Thymeleaf (An toàn null)
         const userId = [[${nxvUser != null ? nxvUser.userId : 'null'}]];
+
+        // Check đăng nhập
         if (userId === 'null') { promptLogin(); return; }
 
+        // Hiển thị Loading đẹp
         Swal.fire({
             title: 'Đang mở hộp...',
-            html: 'Chờ xíu nhé...',
+            html: 'Chờ xíu nhé, đang cầu nguyện nhân phẩm! 🙏',
             timerProgressBar: true,
             background: '#111', color: '#fff',
             didOpen: () => { Swal.showLoading() }
         });
 
+        // Gọi API
         fetch(`/api/blindbox/open?userId=${userId}&boxId=${boxId}`, { method: 'POST' })
-        .then(res => { if (!res.ok) throw new Error("Lỗi"); return res.json(); })
-        .then(data => showResult(data))
-        .catch(() => Swal.fire({icon: 'error', title: 'Lỗi', text: 'Số dư không đủ!', background: '#111', color: '#fff'}));
+        .then(res => {
+            if (!res.ok) throw new Error("Lỗi");
+            return res.json();
+        })
+        .then(data => {
+            // Truyền thêm boxId vào để làm chức năng "Mở Tiếp"
+            showResult(data, boxId);
+        })
+        .catch(() => Swal.fire({
+            icon: 'error',
+            title: 'Thất Bại',
+            text: 'Số dư không đủ hoặc lỗi hệ thống!',
+            background: '#111', color: '#fff'
+        }));
     }
 
     function addToCart(boxId) {
@@ -232,16 +245,71 @@
 
         fetch(`/api/cart/add?userId=${userId}&boxId=${boxId}`, { method: 'POST' })
         .then(res => {
-            if(res.ok) Swal.fire({ icon: 'success', title: 'Đã thêm vào giỏ!', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, background: '#111', color: '#fff' });
+            if(res.ok) {
+                const Toast = Swal.mixin({
+                    toast: true, position: 'top-end', showConfirmButton: false, timer: 2000,
+                    background: '#111', color: '#fff', iconColor: '#2ecc71'
+                });
+                Toast.fire({ icon: 'success', title: 'Đã thêm vào giỏ!' });
+            }
         });
     }
 
-    function showResult(data) {
-        let color = data.rarity === 'S' ? '#ffd700' : (data.rarity === 'A' ? '#ff4757' : '#fff');
+    // --- HIỂN THỊ KẾT QUẢ (KHÔNG RELOAD TRANG) ---
+    function showResult(data, currentBoxId) {
+        // 1. CẬP NHẬT SỐ DƯ NGAY LẬP TỨC (Real-time DOM update)
+        if(data.currentBalance != null) {
+            const formattedBalance = new Intl.NumberFormat('en-US').format(data.currentBalance);
+            // Cập nhật ở header (ID: wallet-balance)
+            const walletEl = document.getElementById('wallet-balance');
+            if(walletEl) walletEl.innerText = formattedBalance;
+        }
+
+        // 2. Xử lý màu sắc Rank
+        let color = '#fff';
+        if (data.rarity === 'S') color = '#ffd700';
+        else if (data.rarity === 'A') color = '#ff4757';
+        else if (data.rarity === 'B') color = '#9b59b6';
+        else if (data.rarity === 'C') color = '#3498db';
+
+        // 3. HTML cho phần Bảo Hiểm (Pity)
+        let pityHtml = "";
+        if (data.rarity !== 'S') {
+            pityHtml = `<div style="margin-top: 15px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; border: 1px dashed ${color};">
+                            <i class="fas fa-shield-alt" style="color: #66fcf1;"></i>
+                            <span style="color: #ccc; font-size: 13px;">Bảo hiểm S:</span>
+                            <b style="color: #66fcf1; font-size: 16px;">${data.spinsUntilPity}</b>
+                            <span style="color: #ccc; font-size: 13px;">lần nữa</span>
+                        </div>`;
+        } else {
+            pityHtml = `<div style="margin-top: 15px; color: #ffd700; font-weight: bold; text-transform: uppercase; animation: pulse 1s infinite;">
+                            <i class="fas fa-crown"></i> CHÚC MỪNG NỔ HŨ!
+                        </div>`;
+        }
+
+        // 4. Hiện Popup Kết Quả
         Swal.fire({
-            title: `<span style="color:${color}">🎉 BẠN TRÚNG: ${data.rarity} 🎉</span>`,
-            html: `<img src="${data.itemImage}" style="width:120px; margin:10px auto; border:2px solid ${color}; border-radius:10px;"><h3>${data.itemName}</h3>`,
-            background: '#111', color: '#fff'
+            title: `<span style="color:${color}; text-shadow: 0 0 15px ${color}">🎉 BẠN TRÚNG: ${data.rarity} 🎉</span>`,
+            html: `
+                <div class="animate__animated animate__zoomIn">
+                    <img src="${data.itemImage}" style="width:150px; height:150px; object-fit:contain; margin:10px auto; border: 2px solid ${color}; border-radius: 15px; box-shadow: 0 0 20px ${color}; background: #1f2833;">
+                    <h3 style="color: #fff; text-transform: uppercase; margin-bottom: 5px;">${data.itemName}</h3>
+                    <div style="font-size: 13px; color: #aaa;">Số dư còn lại: <span style="color: #fff;">${new Intl.NumberFormat('en-US').format(data.currentBalance)}</span></div>
+                    ${pityHtml}
+                </div>
+            `,
+            background: 'rgba(15, 20, 25, 0.95)',
+            showCancelButton: true,
+            confirmButtonText: 'Mở Tiếp! 🎲',
+            cancelButtonText: 'Đóng',
+            confirmButtonColor: color, // Nút Mở tiếp sẽ cùng màu với Rank vật phẩm vừa ra
+            cancelButtonColor: '#333'
+        }).then((result) => {
+            // NẾU BẤM "MỞ TIẾP" -> GỌI LẠI HÀM openBox (Đệ quy)
+            if (result.isConfirmed) {
+                openBox(currentBoxId);
+            }
+            // Nếu đóng -> Không làm gì cả (Tiền đã update rồi)
         });
     }
 
@@ -250,5 +318,3 @@
         .then((res) => { if(res.isConfirmed) window.location.href='/login'; });
     }
 </script>
-</body>
-</html>

@@ -7,6 +7,98 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        /* CSS Riêng cho trang Inventory (Bổ sung thêm hiệu ứng đẹp hơn global) */
+
+        /* Hiệu ứng Rank Badge Góc */
+        .rank-badge-corner {
+            position: absolute; top: 0; left: 0;
+            padding: 5px 15px;
+            border-bottom-right-radius: 15px;
+            font-weight: 900; font-size: 14px;
+            color: #000; z-index: 2;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+            text-transform: uppercase;
+        }
+
+        /* Màu Rank chuẩn game */
+        .rank-S { background: linear-gradient(45deg, #ffd700, #fffa65); }
+        .rank-A { background: linear-gradient(45deg, #ff4757, #ff6b81); color: #fff; }
+        .rank-B { background: linear-gradient(45deg, #9b59b6, #a55eea); color: #fff; }
+        .rank-C { background: linear-gradient(45deg, #3498db, #48dbfb); color: #fff; }
+        .rank-D { background: linear-gradient(45deg, #95a5a6, #bdc3c7); color: #333; }
+
+        /* Card Sản Phẩm */
+        .box-card {
+            background: rgba(30, 30, 40, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            transition: 0.3s;
+            display: flex; flex-direction: column;
+            backdrop-filter: blur(5px);
+        }
+        .box-card:hover {
+            border-color: var(--neon-cyan);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 252, 241, 0.15);
+        }
+
+        /* Ảnh sản phẩm */
+        .box-image {
+            padding: 20px;
+            background: radial-gradient(circle, #2c3e50 0%, #0b0c10 100%);
+            text-align: center;
+            height: 200px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .box-image img {
+            max-width: 100%; max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+            transition: 0.3s;
+        }
+        .box-card:hover .box-image img { transform: scale(1.1) rotate(3deg); }
+
+        /* Thông tin sản phẩm */
+        .box-info {
+            padding: 15px;
+            background: rgba(11, 12, 16, 0.9);
+            flex-grow: 1;
+            display: flex; flex-direction: column; justify-content: space-between;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .item-name {
+            color: #fff; font-weight: 700; margin-bottom: 5px;
+            font-size: 16px;
+            overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+        }
+
+        .market-price {
+            color: #aaa; font-size: 13px; margin-bottom: 15px;
+        }
+
+        /* Nút Bán Lại */
+        .btn-sell {
+            width: 100%;
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid #2ecc71;
+            color: #2ecc71;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600; font-size: 13px;
+            transition: 0.3s; cursor: pointer;
+            text-transform: uppercase;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+        .btn-sell:hover {
+            background: #2ecc71; color: #000;
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.6);
+        }
+    </style>
 </head>
 <body>
 
@@ -19,35 +111,39 @@
 
     <div class="menu">
         <a href="/" class="nav-link">🏠 Trang Chủ</a>
-        <a href="/cart" class="nav-link" th:classappend="${currentPage == 'cart'} ? 'active'">🛍️ Giỏ Hàng</a>
-        <a href="/inventory" class="nav-link" th:classappend="${currentPage == 'inventory'} ? 'active'">🎒 Kho Đồ</a>
+        <a href="/cart" class="nav-link">🛍️ Giỏ Hàng</a>
+        <a href="/inventory" class="nav-link active">🎒 Kho Đồ</a>
         <a href="/deposit" class="nav-link deposit-btn">💎 Nạp Xu</a>
-
         <a href="/admin" class="nav-link admin-btn" th:if="${nxvUser != null and nxvUser.isAdmin}">🛠️ Quản Trị</a>
     </div>
 
-    <div class="user-info" th:if="${nxvUser != null}">
-        <div class="wallet me-3">
-            💰 <span id="wallet-balance" th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span>
+    <div class="user-info d-flex align-items-center" th:if="${nxvUser != null}">
+        <div class="wallet-badge me-3" title="Số Dư Hiện Tại">
+            <i class="fas fa-coins wallet-icon"></i>
+            <span id="wallet-balance" class="wallet-amount" th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span>
+            <small class="currency">đ</small>
         </div>
 
-        <div class="user-dropdown">
-            <span class="fw-bold text-light me-2" th:text="${nxvUser.username}">User</span>
-            <img th:src="'https://ui-avatars.com/api/?background=random&color=fff&name=' + ${nxvUser.fullName}" class="user-avatar">
+        <div class="user-dropdown-container">
+            <div class="user-trigger">
+                <span class="username d-none d-lg-inline me-2" th:text="${nxvUser.username}">User</span>
+                <img th:src="'https://ui-avatars.com/api/?background=random&color=fff&name=' + ${nxvUser.fullName}" class="user-avatar-glow">
+            </div>
 
             <div class="dropdown-menu-custom">
-                <div style="padding: 10px 20px; border-bottom: 1px solid #333; color: #aaa; font-size: 12px;">
-                    Xin chào, <b style="color: #fff;" th:text="${nxvUser.fullName}">Name</b>
+                <div class="dropdown-header-info">
+                    Xin chào, <b th:text="${nxvUser.fullName}" style="color: #fff;">Name</b>
                 </div>
                 <a href="/profile" class="dropdown-item-custom"><i class="fas fa-id-card"></i> Hồ Sơ Cá Nhân</a>
-                <a href="/shipment/history" class="dropdown-item-custom"><i class="fas fa-history"></i> Lịch Sử Giao Hàng</a>
-                <a href="/logout" class="dropdown-item-custom" style="color: #ff4757;"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a>
+                <a href="/inventory" class="dropdown-item-custom"><i class="fas fa-box-open"></i> Kho Đồ</a>
+                <a href="/shipment/history" class="dropdown-item-custom"><i class="fas fa-history"></i> Lịch Sử Giao Dịch</a>
+                <a href="/logout" class="dropdown-item-custom logout"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a>
             </div>
         </div>
     </div>
 
     <div class="user-info" th:if="${nxvUser == null}">
-        <a href="/login" class="btn-buy" style="padding: 8px 20px; text-decoration: none; width: auto; margin: 0;">Đăng Nhập</a>
+        <a href="/login" class="btn-buy" style="padding: 8px 25px; text-decoration: none; display: inline-block;">Đăng Nhập</a>
     </div>
 </header>
 
@@ -62,38 +158,36 @@
             </a>
 
             <a href="/shipment/create" class="btn-ship-request" th:if="${!inventoryList.isEmpty()}">
-                <i class="fas fa-truck-fast"></i> Yêu Cầu Giao Hàng
+                <i class="fas fa-truck-fast"></i> YÊU CẦU GIAO HÀNG
             </a>
         </div>
     </div>
 
-    <div th:if="${inventoryList.isEmpty()}" style="text-align: center; color: #888; margin-top: 80px;">
-        <i class="fas fa-ghost fa-4x mb-3" style="color: #333;"></i>
+    <div th:if="${inventoryList.isEmpty()}" class="text-center text-muted mt-5">
+        <i class="fas fa-ghost fa-4x mb-3" style="color: #444;"></i>
         <h3>Kho trống trơn!</h3>
-        <p>Hãy ra trang chủ mở hộp để kiếm đồ nhé.</p>
-        <a href="/" class="btn-buy" style="display:inline-block; width:auto; padding: 10px 30px; margin-top:20px;">Đi Săn Ngay</a>
+        <p>Hãy ra trang chủ mở hộp để kiếm vật phẩm xịn nhé.</p>
+        <a href="/" class="btn-buy mt-3" style="display:inline-block; width:auto; padding: 10px 30px;">Đi Săn Ngay</a>
     </div>
 
     <div class="box-grid">
         <div class="box-card" th:each="item : ${inventoryList}" th:id="'card-' + ${item.inventoryId}">
-            <div class="rank-badge"
+            <div class="rank-badge-corner"
                  th:classappend="'rank-' + ${item.boxItem.rarityLevel}"
-                 th:text="'Rank ' + ${item.boxItem.rarityLevel}"></div>
+                 th:text="${item.boxItem.rarityLevel}">S</div>
 
             <div class="box-image">
-                <img th:src="${item.boxItem.imageUrl}" alt="Item">
+                <img th:src="${item.boxItem.imageUrl}" alt="Item Image">
             </div>
 
             <div class="box-info">
-                <h3 th:text="${item.boxItem.itemName}">Tên Vật Phẩm</h3>
-
-                <p style="font-size:13px; color:#888; margin-bottom: 5px;">Giá trị thực:</p>
-                <div style="font-size: 16px; font-weight: bold; color: #fff; margin-bottom: 15px;">
-                    <span th:text="${#numbers.formatDecimal(item.boxItem.marketValue, 0, 'COMMA', 0, 'POINT')}">0</span> đ
+                <div>
+                    <div class="item-name" th:text="${item.boxItem.itemName}">Item Name</div>
+                    <div class="market-price">Giá trị thực: <b class="text-light" th:text="${#numbers.formatDecimal(item.boxItem.marketValue, 0, 'COMMA', 0, 'POINT')}">0</b> đ</div>
                 </div>
 
                 <button class="btn-sell" th:onclick="'sellItem(' + ${item.inventoryId} + ')'">
-                    <i class="fas fa-hand-holding-dollar"></i> Bán Lại (90%)
+                    <i class="fas fa-hand-holding-dollar"></i> BÁN LẠI (90%)
                 </button>
             </div>
         </div>
@@ -102,12 +196,14 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script th:inline="javascript">
     function sellItem(inventoryId) {
         const userId = [[${nxvUser.userId}]];
+
         Swal.fire({
             title: 'Bán vật phẩm này?',
-            text: "Bạn sẽ nhận lại 90% giá trị vào ví.",
+            text: "Bạn sẽ nhận lại 90% giá trị thực của vật phẩm vào ví.",
             icon: 'question',
             showCancelButton: true,
             confirmButtonColor: '#2ecc71',
@@ -117,19 +213,46 @@
             background: '#1f2833', color: '#fff'
         }).then((result) => {
             if (result.isConfirmed) {
+                // Gọi API Bán hàng
                 fetch(`/api/blindbox/sell?userId=${userId}&inventoryId=${inventoryId}`, { method: 'POST' })
-                .then(r => { if(!r.ok) throw new Error(); return r.json(); })
-                .then(d => {
-                    const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, background: '#1f2833', color: '#fff', iconColor: '#2ecc71' });
-                    Toast.fire({ icon: 'success', title: d.message });
-                    document.getElementById('card-' + inventoryId).remove();
-                    document.getElementById('wallet-balance').innerText = new Intl.NumberFormat('vi-VN').format(d.newBalance);
-                    if(document.querySelectorAll('.box-card').length === 0) location.reload();
+                .then(response => {
+                    if (!response.ok) throw new Error("Lỗi bán hàng!");
+                    return response.json();
                 })
-                .catch(() => Swal.fire({ title: 'Lỗi!', text: 'Không thể bán.', icon: 'error', background: '#1f2833', color: '#fff' }));
+                .then(data => {
+                    // 1. Thông báo thành công
+                    const Toast = Swal.mixin({
+                        toast: true, position: 'top-end', showConfirmButton: false, timer: 3000,
+                        background: '#1f2833', color: '#fff', iconColor: '#2ecc71'
+                    });
+                    Toast.fire({ icon: 'success', title: data.message });
+
+                    // 2. Xóa Card Item ngay lập tức (Hiệu ứng mờ dần)
+                    let card = document.getElementById('card-' + inventoryId);
+                    card.style.transition = "all 0.5s";
+                    card.style.opacity = "0";
+                    card.style.transform = "scale(0.8)";
+                    setTimeout(() => {
+                        card.remove();
+                        // Nếu kho hết đồ thì reload
+                        if(document.querySelectorAll('.box-card').length === 0) location.reload();
+                    }, 500);
+
+                    // 3. Cập nhật số dư NGAY LẬP TỨC (Fix delay)
+                    // Format số tiền kiểu Việt Nam (1.000.000)
+                    let newBalanceFormatted = new Intl.NumberFormat('en-US').format(data.newBalance);
+                    // Tìm tất cả chỗ hiển thị số dư để update (Header + Dropdown)
+                    document.querySelectorAll('#wallet-balance').forEach(el => {
+                        el.innerText = newBalanceFormatted;
+                    });
+                })
+                .catch(() => {
+                    Swal.fire({ title: 'Lỗi!', text: 'Không thể thực hiện giao dịch.', icon: 'error', background: '#1f2833', color: '#fff' });
+                });
             }
         })
     }
 </script>
+
 </body>
 </html>

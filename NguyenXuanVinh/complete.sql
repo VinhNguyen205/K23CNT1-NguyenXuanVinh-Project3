@@ -646,3 +646,26 @@ UPDATE BoxItems SET ImageURL = '/images/gs-ningguang.jpg' WHERE ItemName = N'Nin
 UPDATE BoxItems SET ImageURL = '/images/gs-yanfei.jpg' WHERE ItemName = N'Yanfei';
 
 PRINT N'Đã cập nhật xong toàn bộ ảnh từng nhân vật!';
+
+use BlindBoxDB;
+-- Cập nhật giá cho 4 Box đầu tiên (BoxID 1, 2, 3, 4)
+
+-- Hộp 1: Hộp Thường (Tăng lên 150k)
+UPDATE BlindBoxes 
+SET Price = 150000 
+WHERE BoxID = 1;
+
+-- Hộp 2: Hộp Hiếm (Tăng lên 500k)
+UPDATE BlindBoxes 
+SET Price = 200000 
+WHERE BoxID = 2;
+
+-- Hộp 3: Hộp Sử Thi (Tăng lên 1 triệu)
+UPDATE BlindBoxes 
+SET Price = 175000 
+WHERE BoxID = 3;
+
+-- Hộp 4: Hộp Huyền Thoại (Tăng lên 2.5 triệu - Cho đại gia mở)
+UPDATE BlindBoxes 
+SET Price = 150000 
+WHERE BoxID = 4;

@@ -977,3 +977,228 @@ body.auth-body {
     text-align: center;
     font-weight: 600;
 }
+/* =========================================
+   NEW HEADER USER STYLE (SEPARATED & CLEAN)
+   ========================================= */
+
+/* --- 1. HUY HIỆU VÍ TIỀN (WALLET BADGE) --- */
+.wallet-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    /* Màu vàng Gold sang trọng cho tiền */
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid #ffd700;
+    color: #ffd700;
+    padding: 8px 16px;
+    border-radius: 30px; /* Bo tròn hình viên thuốc */
+    font-weight: 800;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    height: 42px; /* Chiều cao cố định để căn hàng */
+    transition: 0.3s;
+    white-space: nowrap; /* Chống xuống dòng */
+}
+
+.wallet-badge:hover {
+    background: rgba(255, 215, 0, 0.2);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    transform: translateY(-2px);
+}
+
+.wallet-icon { font-size: 18px; }
+.wallet-amount { font-size: 16px; }
+.currency { font-size: 12px; opacity: 0.8; margin-left: 2px; }
+
+
+/* --- 2. USER DROPDOWN CONTAINER --- */
+.user-dropdown-container {
+    position: relative;
+    height: 42px; /* Cùng chiều cao với ví tiền */
+    display: flex;
+    align-items: center;
+}
+
+/* Phần kích hoạt Dropdown (Tên + Avatar) */
+.user-trigger {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50px;
+    border: 2px solid transparent; /* Viền trong suốt chờ hover */
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05); /* Nền nhẹ */
+}
+
+/* Hiệu ứng khi di chuột vào Avatar */
+.user-trigger:hover {
+    border-color: var(--neon-cyan); /* Hiện viền xanh */
+    background: rgba(102, 252, 241, 0.1);
+    box-shadow: 0 0 20px rgba(102, 252, 241, 0.4); /* Phát sáng */
+}
+
+.username {
+    font-weight: 700;
+    color: #fff;
+    font-size: 14px;
+    padding-left: 10px;
+}
+
+.user-avatar-glow {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff; /* Viền trắng mặc định */
+    transition: 0.3s;
+}
+.user-trigger:hover .user-avatar-glow {
+    border-color: var(--neon-cyan); /* Đổi màu viền avatar khi hover */
+}
+
+
+/* --- 3. DROPDOWN MENU (Tinh chỉnh lại vị trí) --- */
+.dropdown-menu-custom {
+    position: absolute;
+    top: 120%; /* Đẩy xuống dưới */
+    right: 0;
+    width: 240px;
+    background-color: #1f2833;
+    border: 1px solid var(--neon-cyan);
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(15px);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Hiệu ứng nảy */
+    overflow: hidden;
+    z-index: 2000;
+}
+
+/* Hiện menu khi hover vào container cha */
+.user-dropdown-container:hover .dropdown-menu-custom {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Cầu nối chống trượt chuột */
+.user-dropdown-container::after {
+    content: '';
+    position: absolute;
+    top: 100%; left: 0; width: 100%; height: 25px;
+}
+
+/* Các item trong menu (Giữ nguyên style cũ cho đồng bộ) */
+.dropdown-header-info { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); color: #aaa; font-size: 13px; background: rgba(0,0,0,0.2); }
+.dropdown-item-custom { display: flex; align-items: center; gap: 10px; padding: 12px 20px; color: #c5c6c7; text-decoration: none; transition: 0.2s; font-size: 14px; }
+.dropdown-item-custom:hover { background: rgba(102, 252, 241, 0.1); color: #66fcf1; padding-left: 25px; }
+.dropdown-item-custom.logout { border-top: 1px solid rgba(255,255,255,0.05); color: #ff4757; }
+.dropdown-item-custom.logout:hover { background: rgba(255, 71, 87, 0.1); color: #ff6b81; }
+/* =========================================
+               FIX DETAIL PAGE
+   ========================================= */
+
+/* Container chính của trang chi tiết */
+.detail-container {
+    display: flex;
+    gap: 40px; /* Khoảng cách giữa ảnh và thông tin */
+    background: rgba(19, 23, 29, 0.95); /* Nền tối mờ */
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid rgba(102, 252, 241, 0.2);
+    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    margin-bottom: 50px;
+    align-items: center; /* Căn giữa theo chiều dọc */
+}
+
+/* Khu vực chứa ảnh (Giới hạn kích thước) */
+.detail-image {
+    flex: 1; /* Chiếm 1 phần */
+    max-width: 400px; /* Giới hạn chiều rộng tối đa */
+    text-align: center;
+    position: relative;
+}
+
+.detail-image img {
+    max-width: 100%; /* Ảnh không bao giờ tràn khung */
+    max-height: 400px; /* Giới hạn chiều cao */
+    object-fit: contain; /* Giữ nguyên tỷ lệ ảnh */
+    border-radius: 15px;
+    box-shadow: 0 0 25px rgba(102, 252, 241, 0.3); /* Hiệu ứng tỏa sáng nhẹ */
+    transition: transform 0.3s;
+}
+
+.detail-image:hover img {
+    transform: scale(1.05); /* Phóng to nhẹ khi hover */
+}
+
+/* Khu vực thông tin bên phải */
+.detail-info {
+    flex: 1.5; /* Chiếm 1.5 phần (rộng hơn ảnh) */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.detail-info h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    line-height: 1.2;
+}
+
+.price-tag.large {
+    font-size: 36px;
+    color: var(--neon-yellow);
+    font-weight: 900;
+    text-shadow: 0 0 15px rgba(241, 196, 15, 0.4);
+    margin-bottom: 20px;
+}
+
+.desc {
+    font-size: 15px;
+    color: #aaa;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    border-left: 3px solid var(--neon-blue);
+    padding-left: 15px;
+}
+
+/* Nút bấm to, rõ ràng */
+.big-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: 0.3s;
+}
+
+/* Responsive: Trên điện thoại sẽ xếp dọc */
+@media (max-width: 992px) {
+    .detail-container {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .detail-image {
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .detail-image img {
+        max-height: 300px;
+    }
+
+    .desc {
+        border-left: none;
+        border-top: 2px solid var(--neon-blue);
+        padding-top: 15px;
+        padding-left: 0;
+    }
+}

@@ -3,111 +3,254 @@
 <head>
     <title>Gửi Yêu Cầu Ship Đồ</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        /* CSS RIÊNG CHO TRANG SHIPMENT CREATE */
+
+        .ship-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap; /* Đảm bảo responsive trên mobile */
+        }
+
+        /* Cột Trái: Form Thông Tin */
+        .ship-left-col {
+            flex: 1;
+            min-width: 320px;
+            background: rgba(19, 23, 29, 0.95);
+            border: 1px solid var(--neon-blue);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            height: fit-content;
+        }
+
+        .form-label-neon {
+            color: var(--neon-cyan);
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            font-size: 14px;
+        }
+
+        .input-neon {
+            width: 100%;
+            background: #0b0c10;
+            border: 1px solid #333;
+            padding: 12px 15px;
+            color: #fff;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+        .input-neon:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(102, 252, 241, 0.2);
+            outline: none;
+        }
+
+        .ship-fee-box {
+            background: rgba(241, 196, 15, 0.1);
+            border: 1px dashed var(--neon-yellow);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            color: var(--neon-yellow);
+            margin-top: 10px;
+        }
+
+        /* Cột Phải: Chọn Đồ */
+        .ship-right-col {
+            flex: 2; /* Chiếm 2 phần */
+            min-width: 350px;
+            background: rgba(19, 23, 29, 0.95);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .select-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        /* Card vật phẩm để chọn */
+        .select-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            position: relative;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .select-card:hover {
+            border-color: var(--neon-cyan);
+            background: rgba(102, 252, 241, 0.05);
+        }
+
+        /* Khi được chọn (Active) */
+        .select-card.active {
+            border: 2px solid var(--neon-cyan);
+            background: rgba(102, 252, 241, 0.1);
+            box-shadow: 0 0 15px rgba(102, 252, 241, 0.2);
+        }
+
+        .select-card img {
+            width: 100px; height: 100px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .select-card h5 {
+            font-size: 14px;
+            color: #fff;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .item-checkbox {
+            position: absolute;
+            top: 10px; left: 10px;
+            transform: scale(1.5);
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        .btn-submit-ship {
+            width: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan));
+            color: #000;
+            font-weight: 800;
+            padding: 15px;
+            border: none;
+            border-radius: 50px;
+            text-transform: uppercase;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+        .btn-submit-ship:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px var(--neon-cyan);
+            color: #fff;
+        }
+
+    </style>
 </head>
 <body>
 
 <header>
     <div class="logo">
-        <a href="/" style="text-decoration:none; color:#66fcf1;">
-            <i class="fas fa-gift"></i> Mystery Box
-        </a>
+        <a href="/" style="text-decoration:none; color:#66fcf1;"><i class="fas fa-gift"></i> Mystery Box</a>
     </div>
 
     <div class="menu">
         <a href="/" class="nav-link">🏠 Trang Chủ</a>
-        <a href="/cart" class="nav-link" th:classappend="${currentPage == 'cart'} ? 'active'">🛍️ Giỏ Hàng</a>
-        <a href="/inventory" class="nav-link" th:classappend="${currentPage == 'inventory'} ? 'active'">🎒 Kho Đồ</a>
+        <a href="/cart" class="nav-link">🛍️ Giỏ Hàng</a>
+        <a href="/inventory" class="nav-link">🎒 Kho Đồ</a>
         <a href="/deposit" class="nav-link deposit-btn">💎 Nạp Xu</a>
-
         <a href="/admin" class="nav-link admin-btn" th:if="${nxvUser != null and nxvUser.isAdmin}">🛠️ Quản Trị</a>
     </div>
 
-    <div class="user-info" th:if="${nxvUser != null}">
-        <div class="wallet me-3">
-            💰 <span id="wallet-balance" th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span>
+    <div class="user-info d-flex align-items-center" th:if="${nxvUser != null}">
+        <div class="wallet-badge me-3" title="Số Dư Hiện Tại">
+            <i class="fas fa-coins wallet-icon"></i>
+            <span id="wallet-balance" class="wallet-amount" th:text="${#numbers.formatDecimal(nxvUser.walletBalance, 0, 'COMMA', 0, 'POINT')}">0</span>
+            <small class="currency">đ</small>
         </div>
 
-        <div class="user-dropdown">
-            <span class="fw-bold text-light me-2" th:text="${nxvUser.username}">User</span>
-            <img th:src="'https://ui-avatars.com/api/?background=random&color=fff&name=' + ${nxvUser.fullName}" class="user-avatar">
+        <div class="user-dropdown-container">
+            <div class="user-trigger">
+                <span class="username d-none d-lg-inline me-2" th:text="${nxvUser.username}">User</span>
+                <img th:src="'https://ui-avatars.com/api/?background=random&color=fff&name=' + ${nxvUser.fullName}" class="user-avatar-glow">
+            </div>
 
             <div class="dropdown-menu-custom">
-                <div style="padding: 10px 20px; border-bottom: 1px solid #333; color: #aaa; font-size: 12px;">
-                    Xin chào, <b style="color: #fff;" th:text="${nxvUser.fullName}">Name</b>
+                <div class="dropdown-header-info">
+                    Xin chào, <b th:text="${nxvUser.fullName}" style="color: #fff;">Name</b>
                 </div>
                 <a href="/profile" class="dropdown-item-custom"><i class="fas fa-id-card"></i> Hồ Sơ Cá Nhân</a>
-                <a href="/shipment/history" class="dropdown-item-custom"><i class="fas fa-history"></i> Lịch Sử Giao Hàng</a>
-                <a href="/logout" class="dropdown-item-custom" style="color: #ff4757;"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a>
+                <a href="/inventory" class="dropdown-item-custom"><i class="fas fa-box-open"></i> Kho Đồ</a>
+                <a href="/shipment/history" class="dropdown-item-custom"><i class="fas fa-history"></i> Lịch Sử Giao Dịch</a>
+                <a href="/logout" class="dropdown-item-custom logout"><i class="fas fa-sign-out-alt"></i> Đăng Xuất</a>
             </div>
         </div>
     </div>
 
     <div class="user-info" th:if="${nxvUser == null}">
-        <a href="/login" class="btn-buy" style="padding: 8px 20px; text-decoration: none; width: auto; margin: 0;">Đăng Nhập</a>
+        <a href="/login" class="btn-buy" style="padding: 8px 25px; text-decoration: none; display: inline-block;">Đăng Nhập</a>
     </div>
 </header>
 
 <div class="container mt-5">
 
-    <h2 class="section-title">📦 TẠO ĐƠN VẬN CHUYỂN</h2>
+    <h2 class="section-title text-center mb-5">📦 TẠO ĐƠN VẬN CHUYỂN</h2>
 
     <div th:if="${error}" class="alert alert-danger text-center" th:text="${error}"></div>
 
-    <form action="/shipment/submit" method="post" class="shipment-layout">
+    <form action="/shipment/submit" method="post" class="ship-container">
 
-        <div class="ship-info-card">
-            <h5><i class="fas fa-map-marker-alt"></i> Thông Tin Nhận Hàng</h5>
+        <div class="ship-left-col">
+            <h4 style="color: #fff; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px;">
+                <i class="fas fa-map-marker-alt text-info"></i> Thông Tin Nhận Hàng
+            </h4>
 
-            <label>Họ tên người nhận:</label>
-            <input type="text" name="receiverName" class="ship-input" required th:value="${nxvUser.fullName}">
+            <label class="form-label-neon">Người nhận</label>
+            <input type="text" name="receiverName" class="input-neon" required th:value="${nxvUser.fullName}">
 
-            <label>Số điện thoại:</label>
-            <input type="text" name="phoneNumber" class="ship-input" required th:value="${nxvUser.phoneNumber}">
+            <label class="form-label-neon">Số điện thoại</label>
+            <input type="text" name="phoneNumber" class="input-neon" required th:value="${nxvUser.phoneNumber}">
 
-            <label>Địa chỉ giao hàng:</label>
-            <textarea name="address" class="ship-input" rows="3" required th:text="${nxvUser.address}"></textarea>
+            <label class="form-label-neon">Địa chỉ giao hàng</label>
+            <textarea name="address" class="input-neon" rows="3" required th:text="${nxvUser.address}"></textarea>
 
-            <label>Ghi chú (Tùy chọn):</label>
-            <textarea name="note" class="ship-input" rows="2" placeholder="VD: Giao giờ hành chính..."></textarea>
+            <label class="form-label-neon">Ghi chú (Tùy chọn)</label>
+            <textarea name="note" class="input-neon" rows="2" placeholder="Ví dụ: Gọi trước khi giao..."></textarea>
 
-            <div class="shipping-fee-box">
-                <i class="fas fa-coins"></i> Phí vận chuyển cố định:
-                <b>20,000 đ</b>
-                <span>(Sẽ trừ vào ví của bạn)</span>
+            <div class="ship-fee-box">
+                <i class="fas fa-truck"></i> Phí Vận Chuyển: <b>20,000 đ</b>
+                <div style="font-size: 12px; opacity: 0.8;">(Sẽ trừ vào ví của bạn)</div>
             </div>
+
+            <button type="submit" class="btn-submit-ship">
+                <i class="fas fa-paper-plane"></i> XÁC NHẬN GỬI YÊU CẦU
+            </button>
+            <a href="/inventory" class="btn btn-outline-secondary w-100 mt-2" style="border-radius: 50px;">Hủy Bỏ</a>
         </div>
 
-        <div class="select-item-container">
-            <h5 class="text-info mb-4" style="border-bottom: 1px solid #444; padding-bottom: 10px;">
-                <i class="fas fa-check-double"></i> Chọn vật phẩm muốn Ship về:
-            </h5>
+        <div class="ship-right-col">
+            <h4 style="color: #fff; margin-bottom: 20px;">
+                <i class="fas fa-check-square text-success"></i> Chọn Vật Phẩm Muốn Ship
+            </h4>
 
             <div th:if="${items.isEmpty()}" class="text-center text-muted py-5">
-                <h4>Kho trống trơn! 🕸️</h4>
-                <p>Bạn chưa có món đồ nào trong kho để ship.</p>
+                <i class="fas fa-box-open fa-3x mb-3"></i>
+                <p>Bạn Không Có Vật Phẩm Nào.</p>
             </div>
 
-            <div class="select-item-grid">
-                <div th:each="item : ${items}" class="select-card" onclick="toggleCheck(this)">
-                    <input type="checkbox" name="selectedItems" th:value="${item.inventoryId}" onclick="event.stopPropagation()">
+            <div class="select-grid">
+                <div th:each="item : ${items}" class="select-card" onclick="toggleCard(this)">
+                    <input type="checkbox" name="selectedItems" th:value="${item.inventoryId}" class="item-checkbox" onclick="event.stopPropagation()">
 
-                    <span class="badge"
-                          th:classappend="'rank-' + ${item.boxItem.rarityLevel}"
-                          th:text="${item.boxItem.rarityLevel}">S</span>
+                    <span class="badge position-absolute top-0 end-0 m-2"
+                          th:classappend="'bg-' + (${item.boxItem.rarityLevel == 'S'} ? 'warning text-dark' : 'secondary')"
+                          th:text="${item.boxItem.rarityLevel}">Rank</span>
 
                     <img th:src="${item.boxItem.imageUrl}" alt="Item">
-                    <h4 th:text="${item.boxItem.itemName}">Tên Item</h4>
+                    <h5 th:text="${item.boxItem.itemName}">Tên Item</h5>
                 </div>
-            </div>
-
-            <div class="ship-actions">
-                <a href="/inventory" class="btn btn-outline-light px-4">Hủy bỏ</a>
-                <button type="submit" class="btn-ship-confirm">
-                    <i class="fas fa-paper-plane"></i> XÁC NHẬN GỬI ĐƠN
-                </button>
             </div>
         </div>
 
@@ -115,7 +258,7 @@
 </div>
 
 <script>
-    function toggleCheck(card) {
+    function toggleCard(card) {
         const checkbox = card.querySelector('input[type="checkbox"]');
         checkbox.checked = !checkbox.checked;
         if(checkbox.checked) {
@@ -125,12 +268,11 @@
         }
     }
 
-    // Đồng bộ class active khi load trang (nếu browser lưu cache form)
-    document.querySelectorAll('.select-card input').forEach(input => {
-        input.addEventListener('change', function() {
-            const card = this.closest('.select-card');
-            if(this.checked) card.classList.add('active');
-            else card.classList.remove('active');
+    // Auto check state on load
+    document.querySelectorAll('.select-card input').forEach(inp => {
+        inp.addEventListener('change', function() {
+            if(this.checked) this.closest('.select-card').classList.add('active');
+            else this.closest('.select-card').classList.remove('active');
         });
     });
 </script>

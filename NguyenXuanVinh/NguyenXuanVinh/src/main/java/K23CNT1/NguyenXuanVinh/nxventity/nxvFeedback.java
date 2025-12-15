@@ -20,6 +20,9 @@ public class nxvFeedback {
     @Column(name = "CustomerName")
     private String customerName;
 
+    @Column(name = "RepliedAt")
+    private LocalDateTime repliedAt;
+
     @Column(name = "Email")
     private String email;
 

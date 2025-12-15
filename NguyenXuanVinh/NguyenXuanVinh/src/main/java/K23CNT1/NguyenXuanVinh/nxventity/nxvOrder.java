@@ -43,7 +43,6 @@ public class nxvOrder {
     @Column(name = "ShippingAddress")
     private String shippingAddress; // Sửa lỗi setShippingAddress
 
-    // QUAN TRỌNG: Đặt tên là orderStatus để Lombok sinh ra setOrderStatus()
     @Column(name = "OrderStatus")
     private String orderStatus;
 
@@ -52,6 +51,9 @@ public class nxvOrder {
 
     @Column(name = "PaymentStatus")
     private String paymentStatus; // PAID, UNPAID
+
+    @Column(name = "DeliveryDate")
+    private LocalDateTime deliveryDate;
 
     // --- HÀM KHỞI TẠO MẶC ĐỊNH ---
     @PrePersist
