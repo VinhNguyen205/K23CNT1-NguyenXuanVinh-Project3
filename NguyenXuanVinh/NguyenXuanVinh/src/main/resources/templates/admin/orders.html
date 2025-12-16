@@ -2,67 +2,112 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Admin - Quản Lý Đơn Hàng</title>
+    <title>Quản Lý Đơn Hàng | NXV Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <style>
+        /* CSS Riêng cho Select Box trạng thái */
+        .status-select {
+            background-color: #1f2833;
+            color: #fff;
+            border: 1px solid #45a29e;
+            padding: 6px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            outline: none;
+        }
+        .status-select:focus { border-color: #66fcf1; box-shadow: 0 0 5px #66fcf1; }
+
+        .user-info-small { font-size: 13px; color: #aaa; }
+        .addr-cell { max-width: 250px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    </style>
 </head>
 <body>
 
 <div class="d-flex">
-    <div class="sidebar d-flex flex-column p-3">
-        <div class="sidebar-brand mb-4">NXV ADMIN</div>
-        <ul class="nav flex-column">
-            <li class="nav-item"><a href="/admin" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-            <li class="nav-item"><a href="/admin/orders" class="nav-link active"><i class="fas fa-shopping-cart"></i> Đơn Hàng</a></li>
-            <li class="nav-item"><a href="/admin/inventory" class="nav-link"><i class="fas fa-warehouse"></i> Kho & Cảnh Báo</a></li>
-            <li class="nav-item"><a href="/" class="nav-link text-info mt-3 border-top border-secondary pt-3"><i class="fas fa-home"></i> Về Trang Web</a></li>
+
+    <div class="sidebar d-flex flex-column" style="min-height: 100vh; width: 260px; background: #0b0c10; border-right: 1px solid #333;">
+        <div class="sidebar-brand p-3 text-center border-bottom border-secondary">
+            <h4 class="text-info m-0"><i class="fas fa-gamepad"></i> NXV ADMIN</h4>
+        </div>
+        <ul class="nav flex-column mb-auto p-2">
+            <li class="nav-item"><a href="/admin" class="nav-link text-light"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
+            <li class="nav-item"><a href="/admin/orders" class="nav-link active text-info fw-bold" style="background: rgba(102, 252, 241, 0.1);"><i class="fas fa-shopping-cart me-2"></i> Đơn Hàng</a></li>
+            <li class="nav-item"><a href="/admin/inventory" class="nav-link text-light"><i class="fas fa-warehouse me-2"></i> Kho & Cảnh Báo</a></li>
+            <li class="nav-item"><a href="/admin/blindbox" class="nav-link text-light"><i class="fas fa-box me-2"></i> Sản Phẩm</a></li>
+            <li class="nav-item"><a href="/admin/news" class="nav-link text-light"><i class="fas fa-newspaper me-2"></i> Tin Tức</a></li>
+            <li class="nav-item mt-5"><a href="/" class="nav-link text-info"><i class="fas fa-home me-2"></i> Về Trang Web</a></li>
         </ul>
     </div>
 
-    <div class="main-content w-100">
-        <div class="neon-card">
-            <h2 class="text-light mb-4"><i class="fas fa-file-invoice-dollar"></i> DANH SÁCH ĐƠN HÀNG</h2>
+    <div class="main-content flex-grow-1 p-4" style="background: #1f2833; color: #fff;">
 
-            <table class="table table-dark-custom table-hover">
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Khách Hàng</th>
-                    <th>Ngày Đặt</th>
-                    <th>Tổng Tiền</th>
-                    <th>Trạng Thái</th>
-                    <th>Hành Động</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="order : ${listOrders}">
-                    <td th:text="'#' + ${order.id}">#1</td>
+        <h2 class="text-light mb-4"><i class="fas fa-file-invoice-dollar text-warning"></i> DANH SÁCH ĐƠN HÀNG</h2>
 
-                    <td th:text="${order.user.username}">User</td>
+        <div class="neon-card" style="background: #0b0c10; border: 1px solid var(--neon-cyan); padding: 20px; border-radius: 10px;">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle">
+                    <thead>
+                    <tr class="text-info">
+                        <th>ID</th>
+                        <th>Khách Hàng / SĐT</th>
+                        <th>Địa Chỉ Giao Hàng</th>
+                        <th>Ngày Đặt</th>
+                        <th>Tổng Tiền</th>
+                        <th>Trạng Thái</th>
+                        <th class="text-center">Hành Động</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="order : ${listOrders}">
+                        <td><span class="badge bg-secondary">#<span th:text="${order.id}">1</span></span></td>
 
-                    <td th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">Date</td>
+                        <td>
+                            <div class="fw-bold text-white" th:text="${order.receiverName}">Nguyen Van A</div>
+                            <div class="user-info-small"><i class="fas fa-phone-alt"></i> <span th:text="${order.phoneNumber}">098...</span></div>
+                        </td>
 
-                    <td class="text-warning fw-bold"
-                        th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'">
-                    </td>
+                        <td class="addr-cell" th:title="${order.shippingAddress}">
+                            <i class="fas fa-map-marker-alt text-danger"></i> <span th:text="${order.shippingAddress}">Hà Nội...</span>
+                        </td>
 
-                    <td>
-                        <span th:if="${order.orderStatus == 'COMPLETED'}" class="badge bg-success">Thành công</span>
-                        <span th:if="${order.orderStatus == 'PENDING'}" class="badge bg-warning text-dark">Đang xử lý</span>
-                        <span th:if="${order.orderStatus == 'CANCELLED'}" class="badge bg-danger">Đã hủy</span>
-                    </td>
+                        <td th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">Date</td>
 
-                    <td>
-                        <button th:if="${order.orderStatus == 'PENDING'}"
-                                class="btn btn-sm btn-outline-success"
-                                th:onclick="'updateStatus(' + ${order.id} + ', \'COMPLETED\')'">
-                            <i class="fas fa-check"></i> Duyệt
-                        </button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                        <td class="text-warning fw-bold"
+                            th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'">
+                        </td>
+
+                        <td>
+                            <span th:if="${order.orderStatus == 'PENDING'}" class="badge bg-warning text-dark">⏳ Chờ Xử Lý</span>
+                            <span th:if="${order.orderStatus == 'SHIPPING'}" class="badge bg-info text-dark">🚚 Đang Giao</span>
+                            <span th:if="${order.orderStatus == 'DELIVERED'}" class="badge bg-success">✅ Đã Giao</span>
+                            <span th:if="${order.orderStatus == 'CANCELLED'}" class="badge bg-danger">❌ Đã Hủy</span>
+                        </td>
+
+                        <td class="text-center">
+                            <select class="status-select"
+                                    th:onchange="'updateStatus(' + ${order.id} + ', this.value)'"
+                                    th:disabled="${order.orderStatus == 'DELIVERED' or order.orderStatus == 'CANCELLED'}">
+                                <option value="" disabled selected>-- Chọn --</option>
+                                <option value="SHIPPING" th:if="${order.orderStatus == 'PENDING'}">🚚 Gửi Hàng</option>
+                                <option value="DELIVERED" th:if="${order.orderStatus == 'SHIPPING'}">✅ Hoàn Thành</option>
+                                <option value="CANCELLED" th:if="${order.orderStatus != 'DELIVERED' and order.orderStatus != 'CANCELLED'}">❌ Hủy Đơn</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${listOrders.isEmpty()}">
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="fas fa-box-open fa-3x mb-3"></i>
+                            <p>Chưa có đơn hàng nào.</p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -70,10 +115,40 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function updateStatus(orderId, newStatus) {
-        fetch(`/admin/orders/update-status?orderId=${orderId}&status=${newStatus}`, {method: 'POST'})
-        .then(res => {
-            if(res.ok) Swal.fire('Thành công', '', 'success').then(() => location.reload());
-            else Swal.fire('Lỗi', '', 'error');
+        let actionText = "";
+        if(newStatus === 'SHIPPING') actionText = "Bắt đầu giao hàng?";
+        else if(newStatus === 'DELIVERED') actionText = "Xác nhận đã giao thành công?";
+        else if(newStatus === 'CANCELLED') actionText = "Bạn chắc chắn muốn HỦY đơn này?";
+
+        Swal.fire({
+            title: 'Xác Nhận',
+            text: actionText,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Đồng ý',
+            confirmButtonColor: '#66fcf1',
+            cancelButtonColor: '#333',
+            background: '#111', color: '#fff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Gọi API cập nhật
+                fetch('/admin/shipment/update-status', { // Lưu ý URL này khớp với Controller Admin
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: `orderId=${orderId}&status=${newStatus}`
+                })
+                .then(res => {
+                    if(res.ok) {
+                        Swal.fire({ title: 'Thành công!', icon: 'success', timer: 1500, showConfirmButton: false, background: '#111', color: '#fff' })
+                        .then(() => location.reload());
+                    } else {
+                        Swal.fire('Lỗi', 'Không thể cập nhật', 'error');
+                    }
+                })
+                .catch(() => Swal.fire('Lỗi', 'Lỗi kết nối server', 'error'));
+            } else {
+                location.reload(); // Reset lại dropdown nếu hủy chọn
+            }
         });
     }
 </script>

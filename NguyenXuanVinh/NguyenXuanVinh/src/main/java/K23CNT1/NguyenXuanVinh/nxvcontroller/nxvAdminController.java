@@ -20,85 +20,143 @@ public class nxvAdminController {
     private final nxvAdminService adminService;
     private final nxvUserRepository userRepository;
 
-    // Helper: Check quyền Admin từ Session
+    // --- HELPER: CHECK ADMIN PERMISSIONS ---
     private nxvUser getAdminUser(HttpSession session) {
         Object sessionUser = session.getAttribute("currentUser");
         if (sessionUser instanceof nxvUser) {
             nxvUser user = (nxvUser) sessionUser;
-            // Chỉ trả về user nếu là Admin (IsAdmin = true)
+            // Only return user if they are an Admin (IsAdmin = true)
             if (Boolean.TRUE.equals(user.getIsAdmin())) return user;
         }
         return null;
     }
 
-    // --- 1. DASHBOARD CHÍNH ---
-    // URL: /admin hoặc /admin/dashboard
+    // ==========================================
+    // 1. DASHBOARD
+    // ==========================================
     @GetMapping({"", "/", "/dashboard"})
     public String dashboard(Model model, HttpSession session) {
         nxvUser admin = getAdminUser(session);
-        if (admin == null) return "redirect:/login"; // Đá về login nếu không phải admin
+        if (admin == null) return "redirect:/login";
 
-        // Đẩy dữ liệu thống kê ra Dashboard
         model.addAttribute("nxvUser", admin);
-        model.addAttribute("stats", adminService.getDashboardStats()); // Tổng tiền, user, đơn hàng...
-        model.addAttribute("topUsers", adminService.getTopDepositors()); // Bảng xếp hạng nạp tiền
-        model.addAttribute("boxes", adminService.getAllBoxes()); // List hộp để quản lý nhanh
-        model.addAttribute("listCategories", adminService.getAllCategories());
+        model.addAttribute("stats", adminService.getDashboardStats());
+        model.addAttribute("topUsers", adminService.getTopDepositors());
+        model.addAttribute("boxes", adminService.getAllBoxes()); // Short list for quick management
+        model.addAttribute("listCategories", adminService.getAllCategories()); // For "Add Box" modal
+        model.addAttribute("users", userRepository.findAll()); // For "Add Money" modal
 
-        return "admin/dashboard"; // Trỏ về file dashboard.html
+        return "admin/dashboard";
     }
 
-    // --- 2. QUẢN LÝ NGƯỜI DÙNG (USERS) ---
-    @GetMapping("/users")
-    public String viewUsers(Model model, HttpSession session) {
+    // ==========================================
+    // 2. ORDER MANAGEMENT & SHIPMENT APPROVAL
+    // ==========================================
+    @GetMapping("/orders") // Matches Sidebar link /admin/orders
+    public String viewOrders(Model model, HttpSession session) {
         nxvUser admin = getAdminUser(session);
         if (admin == null) return "redirect:/login";
 
-        model.addAttribute("users", userRepository.findAll());
+        // Fetch all orders from Service
+        model.addAttribute("listOrders", adminService.getAllOrders());
         model.addAttribute("nxvUser", admin);
-        return "admin/users"; // Tạo file users.html nếu chưa có
+        return "admin/orders"; // Points to orders.html
     }
 
+    // API to handle order status updates (Called via AJAX)
+    @PostMapping("/shipment/update-status")
+    @ResponseBody
+    public ResponseEntity<?> updateShipmentStatus(@RequestParam Integer orderId, @RequestParam String status, HttpSession session) {
+        if (getAdminUser(session) == null) return ResponseEntity.status(401).body("Unauthorized");
+
+        // Call service to update status (PENDING -> SHIPPING -> DELIVERED)
+        adminService.updateOrderStatus(orderId, status);
+
+        return ResponseEntity.ok("Status updated successfully!");
+    }
+
+    // ==========================================
+    // 3. INVENTORY & ALERTS
+    // ==========================================
+    @GetMapping("/inventory")
+    public String viewInventory(Model model, HttpSession session) {
+        nxvUser admin = getAdminUser(session);
+        if (admin == null) return "redirect:/login";
+
+        model.addAttribute("lowStockItems", adminService.getLowStockItems());
+        model.addAttribute("nxvUser", admin);
+        return "admin/inventory";
+    }
+
+    @PostMapping("/inventory/update")
+    @ResponseBody
+    public ResponseEntity<?> updateStock(@RequestParam Integer itemId, @RequestParam Integer quantity, HttpSession session) {
+        if (getAdminUser(session) == null) return ResponseEntity.status(401).body("Unauthorized");
+        adminService.updateStock(itemId, quantity);
+        return ResponseEntity.ok("Updated");
+    }
+
+    // ==========================================
+    // 4. USER MANAGEMENT & ADD MONEY
+    // ==========================================
     @PostMapping("/add-money")
     public String addMoney(@RequestParam Integer userId, @RequestParam BigDecimal amount, HttpSession session) {
         if (getAdminUser(session) == null) return "redirect:/login";
         adminService.addMoneyToUser(userId, amount);
-        return "redirect:/admin/users"; // Reload trang users
+        return "redirect:/admin"; // Return to dashboard
     }
 
-    // --- 3. QUẢN LÝ BLIND BOX (SẢN PHẨM) ---
-    @GetMapping("/blindbox")
-    public String viewBlindBoxes(Model model, HttpSession session) {
-        nxvUser admin = getAdminUser(session);
-        if (admin == null) return "redirect:/login";
-
-        model.addAttribute("boxes", adminService.getAllBoxes());
-        model.addAttribute("listCategories", adminService.getAllCategories());
-        model.addAttribute("newBox", new nxvBlindBox()); // Để form thêm mới
-        model.addAttribute("nxvUser", admin);
-        return "admin/blindbox"; // Tạo file blindbox.html
-    }
-
+    // ==========================================
+    // 5. BLIND BOX MANAGEMENT
+    // ==========================================
     @PostMapping("/save-box")
     public String saveBox(@ModelAttribute nxvBlindBox box, HttpSession session) {
         if (getAdminUser(session) == null) return "redirect:/login";
         adminService.saveBox(box);
-        return "redirect:/admin/blindbox";
+        return "redirect:/admin";
     }
 
     @GetMapping("/delete-box/{id}")
     public String deleteBox(@PathVariable Integer id, HttpSession session) {
         if (getAdminUser(session) == null) return "redirect:/login";
         try { adminService.deleteBox(id); } catch (Exception e) {}
-        return "redirect:/admin/blindbox";
+        return "redirect:/admin";
     }
 
-    // --- 4. QUẢN LÝ TIN TỨC (NEWS) ---
+    // ==========================================
+    // 6. CATEGORY MANAGEMENT
+    // ==========================================
+    @GetMapping("/categories")
+    public String viewCategories(Model model, HttpSession session) {
+        nxvUser admin = getAdminUser(session);
+        if (admin == null) return "redirect:/login";
+        model.addAttribute("listCategories", adminService.getAllCategories());
+        model.addAttribute("newCategory", new nxvCategory());
+        model.addAttribute("nxvUser", admin);
+        return "admin/categories";
+    }
+
+    @PostMapping("/categories/save")
+    public String saveCategory(@ModelAttribute nxvCategory category, HttpSession session) {
+        if (getAdminUser(session) == null) return "redirect:/login";
+        adminService.saveCategory(category);
+        return "redirect:/admin/categories";
+    }
+
+    @GetMapping("/categories/delete/{id}")
+    public String deleteCategory(@PathVariable Integer id, HttpSession session) {
+        if (getAdminUser(session) == null) return "redirect:/login";
+        adminService.deleteCategory(id);
+        return "redirect:/admin/categories";
+    }
+
+    // ==========================================
+    // 7. NEWS MANAGEMENT
+    // ==========================================
     @GetMapping("/news")
     public String viewNews(Model model, HttpSession session) {
         nxvUser admin = getAdminUser(session);
         if (admin == null) return "redirect:/login";
-
         model.addAttribute("listNews", adminService.getAllNews());
         model.addAttribute("newNews", new nxvNews());
         model.addAttribute("nxvUser", admin);
@@ -115,30 +173,53 @@ public class nxvAdminController {
     @GetMapping("/news/delete/{id}")
     public String deleteNews(@PathVariable Integer id, HttpSession session) {
         if (getAdminUser(session) == null) return "redirect:/login";
-        try { adminService.deleteNews(id); } catch (Exception e) {}
+        adminService.deleteNews(id);
         return "redirect:/admin/news";
     }
 
-    // --- 5. QUẢN LÝ VẬN CHUYỂN (SHIPMENT) ---
-    // Cái này quan trọng để duyệt đơn ship của user
-    @GetMapping("/shipment")
-    public String viewShipments(Model model, HttpSession session) {
+    // ==========================================
+    // 8. BANNER MANAGEMENT
+    // ==========================================
+    @GetMapping("/banners")
+    public String viewBanners(Model model, HttpSession session) {
         nxvUser admin = getAdminUser(session);
         if (admin == null) return "redirect:/login";
-
-        model.addAttribute("shipmentRequests", adminService.getAllOrders()); // Lấy list đơn
+        model.addAttribute("listBanners", adminService.getAllBanners());
+        model.addAttribute("newBanner", new nxvBanner());
         model.addAttribute("nxvUser", admin);
-        return "admin/shipment"; // Tạo file shipment.html
+        return "admin/banners";
     }
 
-    @PostMapping("/shipment/update-status")
-    @ResponseBody // Trả về JSON để JS xử lý (không reload trang)
-    public ResponseEntity<?> updateShipmentStatus(@RequestParam Integer orderId, @RequestParam String status, HttpSession session) {
-        if (getAdminUser(session) == null) return ResponseEntity.status(401).body("Unauthorized");
-        adminService.updateOrderStatus(orderId, status);
-        return ResponseEntity.ok("Cập nhật trạng thái thành công!");
+    @PostMapping("/banners/save")
+    public String saveBanner(@ModelAttribute nxvBanner banner, HttpSession session) {
+        if (getAdminUser(session) == null) return "redirect:/login";
+        adminService.saveBanner(banner);
+        return "redirect:/admin/banners";
     }
 
-    // --- 6. CÁC DANH MỤC KHÁC (Categories, Banners...) ---
-    // (Giữ nguyên logic cũ nếu cần, hoặc gom gọn vào dashboard)
+    @GetMapping("/banners/delete/{id}")
+    public String deleteBanner(@PathVariable Integer id, HttpSession session) {
+        if (getAdminUser(session) == null) return "redirect:/login";
+        adminService.deleteBanner(id);
+        return "redirect:/admin/banners";
+    }
+
+    // ==========================================
+    // 9. FEEDBACK MANAGEMENT
+    // ==========================================
+    @GetMapping("/feedbacks")
+    public String viewFeedbacks(Model model, HttpSession session) {
+        nxvUser admin = getAdminUser(session);
+        if (admin == null) return "redirect:/login";
+        model.addAttribute("listFeedbacks", adminService.getAllFeedbacks());
+        model.addAttribute("nxvUser", admin);
+        return "admin/feedbacks";
+    }
+
+    @PostMapping("/feedbacks/reply")
+    public String replyFeedback(@RequestParam Integer id, @RequestParam String replyContent, HttpSession session) {
+        if (getAdminUser(session) == null) return "redirect:/login";
+        adminService.replyFeedback(id, replyContent);
+        return "redirect:/admin/feedbacks";
+    }
 }

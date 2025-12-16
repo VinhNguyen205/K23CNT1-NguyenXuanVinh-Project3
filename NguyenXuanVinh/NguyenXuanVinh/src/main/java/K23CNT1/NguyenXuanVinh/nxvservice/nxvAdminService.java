@@ -21,7 +21,7 @@ public class nxvAdminService {
     private final nxvUserRepository userRepository;
     private final nxvTransactionRepository transactionRepository;
     private final nxvBlindBoxRepository boxRepository;
-    private final nxvOrderRepository orderRepository; // Đảm bảo bạn đã có Repo này (Map với bảng Orders)
+    private final nxvOrderRepository orderRepository; // Map với bảng Orders
     private final nxvCategoryRepository categoryRepository;
     private final nxvNewsRepository newsRepository;
     private final nxvBannerRepository bannerRepository;
@@ -38,12 +38,14 @@ public class nxvAdminService {
         // Tổng tiền nạp (DEPOSIT + ADMIN_DEPOSIT)
         BigDecimal deposit = transactionRepository.sumAmountByType("DEPOSIT");
         BigDecimal adminDeposit = transactionRepository.sumAmountByType("ADMIN_DEPOSIT");
+
+        // Xử lý null để tránh lỗi
         BigDecimal totalDeposit = (deposit != null ? deposit : BigDecimal.ZERO)
                 .add(adminDeposit != null ? adminDeposit : BigDecimal.ZERO);
 
-        // Doanh thu thực (Tổng tiền mua box)
+        // Doanh thu thực (Tổng tiền mua box - lấy giá trị dương)
         BigDecimal spent = transactionRepository.sumAmountByType("BUY_BOX");
-        BigDecimal totalSpent = (spent != null ? spent : BigDecimal.ZERO).abs(); // Lấy số dương
+        BigDecimal totalSpent = (spent != null ? spent : BigDecimal.ZERO).abs();
 
         return nxvDashboardStats.builder()
                 .totalUsers(totalUsers)
@@ -53,7 +55,7 @@ public class nxvAdminService {
     }
 
     public List<nxvTopUserDTO> getTopDepositors() {
-        // Lấy Top 5 đại gia
+        // Lấy Top 5 đại gia (Cần Repository có hàm findTopDepositors nhận Pageable)
         return transactionRepository.findTopDepositors(PageRequest.of(0, 5));
     }
 
@@ -90,7 +92,10 @@ public class nxvAdminService {
     @Transactional
     public void saveBox(nxvBlindBox box) {
         if (box.getCreatedAt() == null) box.setCreatedAt(LocalDateTime.now());
-        if (box.getImageUrl() == null || box.getImageUrl().isEmpty()) box.setImageUrl("/images/box.jpg");
+        // Set ảnh mặc định nếu để trống
+        if (box.getImageUrl() == null || box.getImageUrl().trim().isEmpty()) {
+            box.setImageUrl("/images/box-default.jpg");
+        }
         if (box.getIsActive() == null) box.setIsActive(true);
         boxRepository.save(box);
     }
@@ -101,9 +106,10 @@ public class nxvAdminService {
     }
 
     // ==========================================
-    // 4. QUẢN LÝ ĐƠN HÀNG (ORDERS)
+    // 4. QUẢN LÝ ĐƠN HÀNG (ORDERS / SHIPMENT)
     // ==========================================
     public List<nxvOrder> getAllOrders() {
+        // Sắp xếp đơn mới nhất lên đầu
         return orderRepository.findAllByOrderByOrderDateDesc();
     }
 
@@ -112,6 +118,7 @@ public class nxvAdminService {
         nxvOrder order = orderRepository.findById(orderId).orElse(null);
         if (order != null) {
             order.setOrderStatus(status);
+            // Nếu giao thành công -> cập nhật ngày giao
             if ("DELIVERED".equalsIgnoreCase(status)) {
                 order.setDeliveryDate(LocalDateTime.now());
             }
@@ -136,7 +143,7 @@ public class nxvAdminService {
     }
 
     // ==========================================
-    // 6. TIN TỨC & BANNER
+    // 6. TIN TỨC (NEWS)
     // ==========================================
     public List<nxvNews> getAllNews() {
         return newsRepository.findAllByOrderByPublishedAtDesc();
@@ -151,6 +158,9 @@ public class nxvAdminService {
         newsRepository.deleteById(id);
     }
 
+    // ==========================================
+    // 7. BANNER
+    // ==========================================
     public List<nxvBanner> getAllBanners() {
         return bannerRepository.findAllByOrderByDisplayOrderAsc();
     }
@@ -165,7 +175,7 @@ public class nxvAdminService {
     }
 
     // ==========================================
-    // 7. PHẢN HỒI (FEEDBACK)
+    // 8. PHẢN HỒI (FEEDBACK)
     // ==========================================
     public List<nxvFeedback> getAllFeedbacks() {
         return feedbackRepository.findAllByOrderBySentAtDesc();
@@ -183,10 +193,11 @@ public class nxvAdminService {
     }
 
     // ==========================================
-    // 8. KHO HÀNG (INVENTORY)
+    // 9. KHO HÀNG (INVENTORY)
     // ==========================================
     public List<nxvBoxItem> getLowStockItems() {
-        // Lấy danh sách item sắp hết hàng (Dưới 20)
+        // Lấy danh sách item sắp hết hàng (Số lượng < 20)
+        // Lưu ý: Cần đảm bảo Repo có hàm findByStockQuantityLessThanOrderByStockQuantityAsc
         return boxItemRepository.findByStockQuantityLessThanOrderByStockQuantityAsc(20);
     }
 

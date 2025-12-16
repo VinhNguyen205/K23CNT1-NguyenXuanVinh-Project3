@@ -460,3 +460,12 @@ END
 
 PRINT '--- CAP NHAT HOAN TAT ---';
 GO
+
+-- Thêm cột CreatedAt nếu chưa có
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'CreatedAt' AND Object_ID = Object_ID(N'UserInventory'))
+BEGIN
+    ALTER TABLE UserInventory ADD CreatedAt DATETIME DEFAULT GETDATE();
+    
+    -- Cập nhật dữ liệu cũ (lấy giá trị từ ObtainedDate sang CreatedAt)
+    EXEC('UPDATE UserInventory SET CreatedAt = ObtainedDate WHERE CreatedAt IS NULL');
+END

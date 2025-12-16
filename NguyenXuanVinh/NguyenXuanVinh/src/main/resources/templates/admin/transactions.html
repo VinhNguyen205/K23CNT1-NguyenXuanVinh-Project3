@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lịch Sử Giao Dịch | NXV Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .trans-card {
+            background: #0b0c10;
+            border: 1px solid var(--neon-yellow); /* Màu vàng cho tiền tệ */
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .amount-plus { color: #2ecc71; font-weight: bold; }
+        .amount-minus { color: #e74c3c; font-weight: bold; }
+        .type-badge { font-size: 0.8rem; padding: 5px 8px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="d-flex">
+    <div class="sidebar d-flex flex-column" style="min-height: 100vh; width: 260px; background: #0b0c10; border-right: 1px solid #333;">
+        <div class="sidebar-brand p-4 text-center border-bottom border-secondary">
+            <h4 class="text-info m-0 fw-bold" style="letter-spacing: 2px;"><i class="fas fa-gamepad"></i> ADMIN</h4>
+        </div>
+        <ul class="nav flex-column mb-auto p-3 gap-2">
+            <li class="nav-item"><a href="/admin" class="nav-link text-light"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
+            <li class="nav-item"><a href="/admin/shipment" class="nav-link text-light"><i class="fas fa-truck-fast me-2"></i> Duyệt Đơn Ship</a></li>
+            <li class="nav-item"><a href="/admin/transactions" class="nav-link active text-dark fw-bold" style="background: var(--neon-yellow); box-shadow: 0 0 10px var(--neon-yellow);"><i class="fas fa-file-invoice-dollar me-2"></i> Lịch Sử Nạp</a></li>
+            <li class="nav-item"><a href="/admin/blindbox" class="nav-link text-light"><i class="fas fa-box me-2"></i> Sản Phẩm</a></li>
+            <li class="nav-item mt-5 border-top border-secondary pt-3"><a href="/" class="nav-link text-info"><i class="fas fa-home me-2"></i> Về Trang Web</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content flex-grow-1 p-4" style="background: #1f2833; color: #fff;">
+
+        <h2 class="text-white mb-4">
+            <i class="fas fa-history text-warning"></i> LỊCH SỬ GIAO DỊCH & DÒNG TIỀN
+        </h2>
+
+        <div class="trans-card">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                    <thead>
+                    <tr style="color: var(--neon-yellow); border-bottom: 2px solid var(--neon-yellow);">
+                        <th>ID GD</th>
+                        <th>Người Dùng</th>
+                        <th>Loại Giao Dịch</th>
+                        <th class="text-end">Số Tiền Biến Động</th>
+                        <th>Thời Gian</th>
+                        <th>Nội Dung Chi Tiết</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="trans : ${listTransactions}">
+                        <td><span class="text-muted">#<span th:text="${trans.transactionId}">1</span></span></td>
+
+                        <td>
+                            <div class="fw-bold text-white" th:text="${trans.user.username}">User</div>
+                            <small class="text-muted" th:text="${trans.user.fullName}">Fullname</small>
+                        </td>
+
+                        <td>
+                            <span th:if="${trans.transactionType == 'DEPOSIT'}" class="badge bg-success type-badge"><i class="fas fa-arrow-down"></i> Nạp Tiền</span>
+                            <span th:if="${trans.transactionType == 'ADMIN_DEPOSIT'}" class="badge bg-primary type-badge"><i class="fas fa-user-shield"></i> Admin Nạp</span>
+                            <span th:if="${trans.transactionType == 'BUY_BOX'}" class="badge bg-danger type-badge"><i class="fas fa-shopping-cart"></i> Mua Hộp</span>
+                            <span th:if="${trans.transactionType == 'ORDER_PAYMENT'}" class="badge bg-warning text-dark type-badge"><i class="fas fa-truck"></i> Phí Ship</span>
+                        </td>
+
+                        <td class="text-end">
+                                <span th:if="${trans.amount > 0}" class="amount-plus">
+                                    +<span th:text="${#numbers.formatDecimal(trans.amount, 0, 'COMMA', 0, 'POINT')}"></span> đ
+                                </span>
+                            <span th:if="${trans.amount < 0}" class="amount-minus">
+                                    <span th:text="${#numbers.formatDecimal(trans.amount, 0, 'COMMA', 0, 'POINT')}"></span> đ
+                                </span>
+                        </td>
+
+                        <td th:text="${#temporals.format(trans.transactionDate, 'dd/MM/yyyy HH:mm:ss')}">Time</td>
+
+                        <td class="text-muted small" th:text="${trans.description}">Nội dung...</td>
+                    </tr>
+
+                    <tr th:if="${listTransactions.isEmpty()}">
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="fas fa-search-dollar fa-3x mb-3"></i>
+                            <p>Chưa có giao dịch nào phát sinh.</p>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
