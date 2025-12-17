@@ -131,7 +131,7 @@
                 </thead>
                 <tbody>
                 <tr th:each="order : ${orders}">
-                    <td style="color: #fff; font-weight: bold;" th:text="'#' + ${order.id}">#1</td>
+                    <td style="color: #fff; font-weight: bold;" th:text="'#' + ${order.orderId}">#1</td>
                     <td th:text="${#temporals.format(order.orderDate, 'dd-MM-yyyy HH:mm')}">01-01-2025</td>
                     <td style="color: #ffd700; font-weight: bold;" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')} + ' đ'">100.000 đ</td>
                     <td>

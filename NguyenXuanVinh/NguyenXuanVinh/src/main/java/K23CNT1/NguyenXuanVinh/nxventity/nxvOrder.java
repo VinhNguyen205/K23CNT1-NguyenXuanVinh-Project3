@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Orders") // Đổi lại thành 'Orders' cho khớp với SQL Script của bạn
-@Data // Tự động sinh getter/setter
+@Table(name = "Orders") // Tên bảng trong SQL Server
+@Data // Tự động sinh getter/setter/toString/hashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -16,55 +16,57 @@ public class nxvOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "OrderID") // Khớp SQL
-    private Integer id;
+    @Column(name = "OrderID")
+    private Integer orderId; // Đặt là orderId để dễ gọi (vd: order.orderId)
 
-    // Quan hệ với User
+    // Quan hệ Many-to-One với bảng Users
     @ManyToOne
-    @JoinColumn(name = "UserID", nullable = false) // Khớp SQL
+    @JoinColumn(name = "UserID", nullable = false)
     private nxvUser user;
 
-    // Ngày đặt hàng
-    @Column(name = "OrderDate") // Khớp SQL
+    @Column(name = "OrderDate")
     private LocalDateTime orderDate;
 
-    // Tổng tiền
-    @Column(name = "TotalAmount") // Khớp SQL
+    @Column(name = "TotalAmount")
     private BigDecimal totalAmount;
-
-    // --- CÁC TRƯỜNG MỚI THÊM ĐỂ SỬA LỖI SERVICE ---
-
-    @Column(name = "ReceiverName")
-    private String receiverName; // Sửa lỗi setReceiverName
-
-    @Column(name = "PhoneNumber")
-    private String phoneNumber;  // Sửa lỗi setPhoneNumber
-
-    @Column(name = "ShippingAddress")
-    private String shippingAddress; // Sửa lỗi setShippingAddress
 
     @Column(name = "OrderStatus")
     private String orderStatus;
 
+    // --- CÁC TRƯỜNG THÔNG TIN GIAO HÀNG ---
+
+    @Column(name = "ReceiverName")
+    private String receiverName;
+
+    @Column(name = "PhoneNumber")
+    private String phoneNumber;
+
+    @Column(name = "ShippingAddress")
+    private String shippingAddress;
+
     @Column(name = "PaymentMethod")
-    private String paymentMethod; // COD, WALLET...
+    private String paymentMethod; // VD: WALLET, COD, VNPAY
 
     @Column(name = "PaymentStatus")
-    private String paymentStatus; // PAID, UNPAID
+    private String paymentStatus; // VD: PAID, UNPAID
 
     @Column(name = "DeliveryDate")
     private LocalDateTime deliveryDate;
 
-    // --- HÀM KHỞI TẠO MẶC ĐỊNH ---
+    // [QUAN TRỌNG] Trường này để sửa lỗi Thymeleaf (order.note)
+    @Column(name = "Note")
+    private String note;
+
+    // --- HÀM TỰ ĐỘNG CHẠY TRƯỚC KHI LƯU VÀO DB ---
     @PrePersist
     protected void onCreate() {
         if (this.orderDate == null) {
             this.orderDate = LocalDateTime.now();
         }
-        if (this.orderStatus == null) {
+        if (this.orderStatus == null || this.orderStatus.isEmpty()) {
             this.orderStatus = "PENDING";
         }
-        if (this.paymentStatus == null) {
+        if (this.paymentStatus == null || this.paymentStatus.isEmpty()) {
             this.paymentStatus = "UNPAID";
         }
     }

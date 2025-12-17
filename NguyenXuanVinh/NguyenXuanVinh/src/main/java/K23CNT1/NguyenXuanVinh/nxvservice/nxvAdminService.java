@@ -17,11 +17,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class nxvAdminService {
 
-    // --- INJECT REPOSITORIES ---
+    // --- KHAI BÁO CÁC REPOSITORY ---
     private final nxvUserRepository userRepository;
     private final nxvTransactionRepository transactionRepository;
     private final nxvBlindBoxRepository boxRepository;
-    private final nxvOrderRepository orderRepository; // Map với bảng Orders
+    private final nxvShipmentRepository shipmentRepository; // Sử dụng ShipmentRepository thay vì Order
     private final nxvCategoryRepository categoryRepository;
     private final nxvNewsRepository newsRepository;
     private final nxvBannerRepository bannerRepository;
@@ -32,18 +32,15 @@ public class nxvAdminService {
     // 1. DASHBOARD & THỐNG KÊ
     // ==========================================
     public nxvDashboardStats getDashboardStats() {
-        // Tổng User
         long totalUsers = userRepository.count();
 
-        // Tổng tiền nạp (DEPOSIT + ADMIN_DEPOSIT)
+        // Tính tổng tiền nạp (Tránh lỗi null)
         BigDecimal deposit = transactionRepository.sumAmountByType("DEPOSIT");
         BigDecimal adminDeposit = transactionRepository.sumAmountByType("ADMIN_DEPOSIT");
-
-        // Xử lý null để tránh lỗi
         BigDecimal totalDeposit = (deposit != null ? deposit : BigDecimal.ZERO)
                 .add(adminDeposit != null ? adminDeposit : BigDecimal.ZERO);
 
-        // Doanh thu thực (Tổng tiền mua box - lấy giá trị dương)
+        // Tính doanh thu thực (Tổng tiền mua box)
         BigDecimal spent = transactionRepository.sumAmountByType("BUY_BOX");
         BigDecimal totalSpent = (spent != null ? spent : BigDecimal.ZERO).abs();
 
@@ -55,12 +52,36 @@ public class nxvAdminService {
     }
 
     public List<nxvTopUserDTO> getTopDepositors() {
-        // Lấy Top 5 đại gia (Cần Repository có hàm findTopDepositors nhận Pageable)
         return transactionRepository.findTopDepositors(PageRequest.of(0, 5));
     }
 
     // ==========================================
-    // 2. QUẢN LÝ USER (NẠP TIỀN)
+    // 2. QUẢN LÝ VẬN ĐƠN (SHIPMENT REQUESTS) - QUAN TRỌNG
+    // ==========================================
+
+    // Tìm kiếm và lọc danh sách yêu cầu giao hàng
+    public List<nxvShipmentRequest> searchShipments(String keyword, String status) {
+        String searchKey = (keyword == null || keyword.trim().isEmpty()) ? null : keyword.trim();
+        String searchStatus = (status == null || status.trim().isEmpty()) ? null : status;
+
+        // Gọi Repository để tìm kiếm theo tiêu chí
+        return shipmentRepository.searchShipments(searchStatus, searchKey);
+    }
+
+    // Cập nhật trạng thái vận đơn (Duyệt, Giao, Hoàn thành, Hủy)
+    @Transactional
+    public boolean updateShipmentStatus(Integer shipmentId, String status) {
+        nxvShipmentRequest shipment = shipmentRepository.findById(shipmentId).orElse(null);
+        if (shipment != null) {
+            shipment.setShipmentStatus(status);
+            shipmentRepository.save(shipment);
+            return true;
+        }
+        return false;
+    }
+
+    // ==========================================
+    // 3. QUẢN LÝ USER (NẠP TIỀN)
     // ==========================================
     @Transactional
     public void addMoneyToUser(Integer userId, BigDecimal amount) {
@@ -72,18 +93,18 @@ public class nxvAdminService {
         user.setWalletBalance(user.getWalletBalance().add(amount));
         userRepository.save(user);
 
-        // Ghi lịch sử giao dịch
+        // Ghi lại lịch sử giao dịch
         nxvTransaction t = new nxvTransaction();
         t.setUser(user);
         t.setAmount(amount);
         t.setTransactionType("ADMIN_DEPOSIT");
-        t.setDescription("Admin nạp tiền: " + amount + "đ");
+        t.setDescription("Admin nạp tiền: " + String.format("%,.0f", amount) + "đ");
         t.setTransactionDate(LocalDateTime.now());
         transactionRepository.save(t);
     }
 
     // ==========================================
-    // 3. QUẢN LÝ SẢN PHẨM (BLIND BOX)
+    // 4. QUẢN LÝ SẢN PHẨM (BLIND BOX)
     // ==========================================
     public List<nxvBlindBox> getAllBoxes() {
         return boxRepository.findAll();
@@ -91,12 +112,15 @@ public class nxvAdminService {
 
     @Transactional
     public void saveBox(nxvBlindBox box) {
-        if (box.getCreatedAt() == null) box.setCreatedAt(LocalDateTime.now());
-        // Set ảnh mặc định nếu để trống
+        if (box.getCreatedAt() == null) {
+            box.setCreatedAt(LocalDateTime.now());
+        }
         if (box.getImageUrl() == null || box.getImageUrl().trim().isEmpty()) {
             box.setImageUrl("/images/box-default.jpg");
         }
-        if (box.getIsActive() == null) box.setIsActive(true);
+        if (box.getIsActive() == null) {
+            box.setIsActive(true);
+        }
         boxRepository.save(box);
     }
 
@@ -106,35 +130,16 @@ public class nxvAdminService {
     }
 
     // ==========================================
-    // 4. QUẢN LÝ ĐƠN HÀNG (ORDERS / SHIPMENT)
-    // ==========================================
-    public List<nxvOrder> getAllOrders() {
-        // Sắp xếp đơn mới nhất lên đầu
-        return orderRepository.findAllByOrderByOrderDateDesc();
-    }
-
-    @Transactional
-    public void updateOrderStatus(Integer orderId, String status) {
-        nxvOrder order = orderRepository.findById(orderId).orElse(null);
-        if (order != null) {
-            order.setOrderStatus(status);
-            // Nếu giao thành công -> cập nhật ngày giao
-            if ("DELIVERED".equalsIgnoreCase(status)) {
-                order.setDeliveryDate(LocalDateTime.now());
-            }
-            orderRepository.save(order);
-        }
-    }
-
-    // ==========================================
-    // 5. QUẢN LÝ DANH MỤC
+    // 5. QUẢN LÝ DANH MỤC (CATEGORY)
     // ==========================================
     public List<nxvCategory> getAllCategories() {
         return categoryRepository.findAll();
     }
 
     public void saveCategory(nxvCategory cat) {
-        if (cat.getIsActive() == null) cat.setIsActive(true);
+        if (cat.getIsActive() == null) {
+            cat.setIsActive(true);
+        }
         categoryRepository.save(cat);
     }
 
@@ -143,14 +148,16 @@ public class nxvAdminService {
     }
 
     // ==========================================
-    // 6. TIN TỨC (NEWS)
+    // 6. QUẢN LÝ TIN TỨC (NEWS)
     // ==========================================
     public List<nxvNews> getAllNews() {
         return newsRepository.findAllByOrderByPublishedAtDesc();
     }
 
     public void saveNews(nxvNews news) {
-        if (news.getPublishedAt() == null) news.setPublishedAt(LocalDateTime.now());
+        if (news.getPublishedAt() == null) {
+            news.setPublishedAt(LocalDateTime.now());
+        }
         newsRepository.save(news);
     }
 
@@ -159,14 +166,16 @@ public class nxvAdminService {
     }
 
     // ==========================================
-    // 7. BANNER
+    // 7. QUẢN LÝ BANNER
     // ==========================================
     public List<nxvBanner> getAllBanners() {
         return bannerRepository.findAllByOrderByDisplayOrderAsc();
     }
 
     public void saveBanner(nxvBanner banner) {
-        if (banner.getCreatedAt() == null) banner.setCreatedAt(LocalDateTime.now());
+        if (banner.getCreatedAt() == null) {
+            banner.setCreatedAt(LocalDateTime.now());
+        }
         bannerRepository.save(banner);
     }
 
@@ -175,7 +184,7 @@ public class nxvAdminService {
     }
 
     // ==========================================
-    // 8. PHẢN HỒI (FEEDBACK)
+    // 8. QUẢN LÝ PHẢN HỒI (FEEDBACK)
     // ==========================================
     public List<nxvFeedback> getAllFeedbacks() {
         return feedbackRepository.findAllByOrderBySentAtDesc();
@@ -193,20 +202,19 @@ public class nxvAdminService {
     }
 
     // ==========================================
-    // 9. KHO HÀNG (INVENTORY)
+    // 9. QUẢN LÝ KHO HÀNG (INVENTORY ALERTS)
     // ==========================================
     public List<nxvBoxItem> getLowStockItems() {
-        // Lấy danh sách item sắp hết hàng (Số lượng < 20)
-        // Lưu ý: Cần đảm bảo Repo có hàm findByStockQuantityLessThanOrderByStockQuantityAsc
-        return boxItemRepository.findByStockQuantityLessThanOrderByStockQuantityAsc(20);
+        // Lấy các item có số lượng tồn kho thấp (< 10)
+        return boxItemRepository.findByStockQuantityLessThanOrderByStockQuantityAsc(10);
     }
 
     @Transactional
     public void updateStock(Integer itemId, Integer quantity) {
         nxvBoxItem item = boxItemRepository.findById(itemId).orElse(null);
         if (item != null) {
-            if (quantity < 0) quantity = 0;
-            item.setStockQuantity(quantity);
+            // Đảm bảo số lượng không âm
+            item.setStockQuantity(Math.max(quantity, 0));
             boxItemRepository.save(item);
         }
     }

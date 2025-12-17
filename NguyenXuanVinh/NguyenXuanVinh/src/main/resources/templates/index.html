@@ -10,39 +10,9 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 
     <style>
-        /* === UPGRADED CSS - NEON CYBERPUNK PREMIUM === */
+        /* === ONLY PAGE-SPECIFIC ENHANCEMENTS (Not in style.css) === */
 
-        :root {
-            --neon-cyan: #00f3ff;
-            --neon-pink: #ff006e;
-            --neon-purple: #b537f2;
-            --neon-gold: #ffd700;
-            --dark-bg: #0a0e27;
-            --card-bg: rgba(15, 20, 35, 0.85);
-        }
-
-        /* === ANIMATIONS === */
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        @keyframes glow-pulse {
-            0%, 100% { box-shadow: 0 0 5px var(--neon-cyan), 0 0 10px var(--neon-cyan); }
-            50% { box-shadow: 0 0 20px var(--neon-cyan), 0 0 30px var(--neon-cyan), 0 0 40px var(--neon-cyan); }
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-
-        @keyframes neon-flicker {
-            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
-            20%, 24%, 55% { opacity: 0.6; }
-        }
-
-        /* === 1. CAROUSEL UPGRADE === */
+        /* 1. Carousel Enhancements */
         .carousel-item {
             height: 550px;
             background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
@@ -75,22 +45,29 @@
             background: linear-gradient(135deg, rgba(0, 243, 255, 0.1), rgba(10, 14, 39, 0.9));
             padding: 30px;
             border-radius: 15px;
-            border: 2px solid var(--neon-cyan);
+            border: 2px solid #66fcf1;
             box-shadow: 0 0 30px rgba(0, 243, 255, 0.4), inset 0 0 20px rgba(0, 243, 255, 0.1);
             backdrop-filter: blur(10px);
             animation: glow-pulse 3s ease-in-out infinite;
         }
 
+        @keyframes glow-pulse {
+            0%, 100% { box-shadow: 0 0 5px #66fcf1, 0 0 10px #66fcf1; }
+            50% { box-shadow: 0 0 20px #66fcf1, 0 0 30px #66fcf1, 0 0 40px #66fcf1; }
+        }
+
         .carousel-caption h2 {
-            animation: neon-flicker 5s linear infinite;
+            color: #66fcf1;
+            text-transform: uppercase;
+            font-weight: 800;
             font-size: 2.5rem;
             letter-spacing: 3px;
         }
 
-        /* === 2. TOP USER CARD ULTRA === */
+        /* 2. Top User Card Ultra */
         .top1-card {
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(10, 14, 39, 0.95));
-            border: 3px solid var(--neon-gold);
+            border: 3px solid #ffd700;
             border-radius: 20px;
             padding: 30px;
             text-align: center;
@@ -110,6 +87,11 @@
             animation: float 3s ease-in-out infinite;
         }
 
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
         .top1-card:hover {
             transform: translateY(-10px) scale(1.02);
             box-shadow: 0 0 60px rgba(255, 215, 0, 0.6);
@@ -117,19 +99,19 @@
 
         .crown-icon {
             font-size: 50px;
-            color: var(--neon-gold);
+            color: #ffd700;
             margin-bottom: 15px;
-            filter: drop-shadow(0 0 20px var(--neon-gold));
+            filter: drop-shadow(0 0 20px #ffd700);
             animation: float 2s ease-in-out infinite;
         }
 
         .top1-avatar {
             width: 120px;
             height: 120px;
-            border: 4px solid var(--neon-gold);
+            border: 4px solid #ffd700;
             border-radius: 50%;
             object-fit: cover;
-            box-shadow: 0 0 30px var(--neon-gold);
+            box-shadow: 0 0 30px #ffd700;
             transition: all 0.3s ease;
         }
 
@@ -137,7 +119,7 @@
             transform: scale(1.1) rotate(5deg);
         }
 
-        /* === 3. TOP LIST ENHANCED === */
+        /* 3. Top List Enhanced */
         .top-list-item {
             display: flex;
             align-items: center;
@@ -166,7 +148,7 @@
         }
 
         .top-list-item:hover {
-            border-color: var(--neon-cyan);
+            border-color: #66fcf1;
             background: linear-gradient(135deg, rgba(0, 243, 255, 0.1), rgba(15, 20, 35, 0.9));
             transform: translateX(5px);
             box-shadow: 0 5px 20px rgba(0, 243, 255, 0.3);
@@ -201,10 +183,10 @@
             border-color: #CD7F32;
         }
 
-        /* === 4. WINNER TICKER ENHANCED === */
+        /* 4. Winner Ticker Enhanced */
         .winner-ticker {
             background: linear-gradient(90deg, #0a0e27, #1a1f3a, #0a0e27);
-            border-bottom: 2px solid var(--neon-cyan);
+            border-bottom: 2px solid #66fcf1;
             color: #fff;
             font-size: 14px;
             padding: 12px 0;
@@ -222,6 +204,11 @@
             width: 100%; height: 100%;
             background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.1), transparent);
             animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
         }
 
         .ticker-wrapper { width: 100%; overflow: hidden; }
@@ -247,9 +234,9 @@
         }
 
         .winner-highlight {
-            color: var(--neon-gold);
+            color: #ffd700;
             font-weight: bold;
-            text-shadow: 0 0 10px var(--neon-gold);
+            text-shadow: 0 0 10px #ffd700;
         }
 
         .rank-tag {
@@ -265,54 +252,22 @@
             letter-spacing: 1px;
         }
 
-        /* === 5. BOX CARD ENHANCED === */
-        .box-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(0, 243, 255, 0.2);
-            border-radius: 15px;
-            overflow: hidden;
-            transition: all 0.4s ease;
-            position: relative;
+        /* 5. News Card Enhancement */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
         }
 
-        .box-card::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: conic-gradient(from 0deg, transparent 0deg, var(--neon-cyan) 60deg, transparent 120deg);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            animation: rotate 3s linear infinite;
-        }
-
-        @keyframes rotate {
-            100% { transform: rotate(360deg); }
-        }
-
-        .box-card:hover::before {
-            opacity: 0.15;
-        }
-
-        .box-card:hover {
-            transform: translateY(-8px);
-            border-color: var(--neon-cyan);
-            box-shadow: 0 10px 40px rgba(0, 243, 255, 0.4);
-        }
-
-        .hot-badge {
-            background: linear-gradient(135deg, #ff006e, #ff4757);
-            animation: glow-pulse 2s ease-in-out infinite;
-        }
-
-        /* === 6. NEWS CARD ENHANCED === */
         .news-card {
-            background: var(--card-bg);
+            background: rgba(31, 40, 51, 0.6);
             border: 1px solid rgba(0, 243, 255, 0.2);
             border-radius: 12px;
             overflow: hidden;
             transition: all 0.3s ease;
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         .news-card::after {
@@ -330,15 +285,41 @@
 
         .news-card:hover {
             transform: translateY(-5px);
-            border-color: var(--neon-pink);
+            border-color: #ff006e;
             box-shadow: 0 8px 30px rgba(255, 0, 110, 0.3);
         }
 
-        /* === 7. FOOTER PREMIUM ULTRA === */
+        .news-thumb {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .news-body {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .news-date {
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        /* 6. Footer Premium */
         .site-footer {
             background: linear-gradient(180deg, #0a0e27 0%, #050608 100%);
-            border-top: 3px solid var(--neon-cyan);
-            color: #b8c5d6; /* Màu xanh xám sáng - dễ đọc */
+            border-top: 3px solid #66fcf1;
+            color: #b8c5d6;
             padding-top: 60px;
             padding-bottom: 30px;
             font-size: 14px;
@@ -352,12 +333,12 @@
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-pink), transparent);
+            background: linear-gradient(90deg, transparent, #66fcf1, #ff006e, transparent);
             animation: shimmer 4s linear infinite;
         }
 
         .footer-heading {
-            color: #ffffff; /* Trắng tinh - cực dễ đọc */
+            color: #ffffff;
             font-weight: 800;
             text-transform: uppercase;
             margin-bottom: 25px;
@@ -374,40 +355,35 @@
             bottom: 0;
             width: 50px;
             height: 3px;
-            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
-            box-shadow: 0 0 10px var(--neon-cyan);
+            background: linear-gradient(90deg, #66fcf1, #ff006e);
+            box-shadow: 0 0 10px #66fcf1;
         }
 
-        .footer-links li {
-            margin-bottom: 12px;
-        }
-
+        .footer-links li { margin-bottom: 12px; }
         .footer-links a {
-            color: #a0b3c9; /* Xanh xám sáng hơn */
+            color: #a0b3c9;
             text-decoration: none;
             transition: all 0.3s ease;
             display: inline-block;
         }
-
         .footer-links a:hover {
-            color: var(--neon-cyan);
+            color: #66fcf1;
             padding-left: 8px;
-            text-shadow: 0 0 10px var(--neon-cyan);
+            text-shadow: 0 0 10px #66fcf1;
         }
 
         .contact-info li {
             margin-bottom: 15px;
             display: flex;
             align-items: flex-start;
-            color: #b8c5d6; /* Màu sáng dễ đọc */
+            color: #b8c5d6;
         }
-
         .contact-info i {
-            color: var(--neon-cyan);
+            color: #66fcf1;
             margin-right: 12px;
             margin-top: 4px;
             font-size: 16px;
-            text-shadow: 0 0 5px var(--neon-cyan);
+            text-shadow: 0 0 5px #66fcf1;
         }
 
         .newsletter-form .form-control {
@@ -421,12 +397,12 @@
 
         .newsletter-form .form-control:focus {
             background: rgba(31, 40, 51, 1);
-            border-color: var(--neon-cyan);
+            border-color: #66fcf1;
             box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
         }
 
         .newsletter-form .btn-submit {
-            background: linear-gradient(135deg, var(--neon-cyan), #0088ff);
+            background: linear-gradient(135deg, #66fcf1, #0088ff);
             color: #000;
             font-weight: bold;
             border: none;
@@ -438,17 +414,17 @@
         }
 
         .newsletter-form .btn-submit:hover {
-            background: linear-gradient(135deg, #fff, var(--neon-cyan));
-            box-shadow: 0 0 20px var(--neon-cyan);
+            background: linear-gradient(135deg, #fff, #66fcf1);
+            box-shadow: 0 0 20px #66fcf1;
             transform: translateY(-2px);
         }
 
         .bct-badge {
             margin-top: 20px;
-            border: 2px solid var(--neon-cyan);
+            border: 2px solid #66fcf1;
             padding: 8px 15px;
             display: inline-block;
-            color: #ffffff; /* Trắng tinh */
+            color: #ffffff;
             font-weight: bold;
             font-size: 12px;
             border-radius: 8px;
@@ -467,44 +443,20 @@
         }
 
         .hover-neon:hover {
-            color: var(--neon-cyan) !important;
-            text-shadow: 0 0 10px var(--neon-cyan);
+            color: #66fcf1 !important;
+            text-shadow: 0 0 10px #66fcf1;
             transform: translateY(-3px);
         }
 
-        /* === 8. SECTION TITLE ENHANCED === */
-        .section-title {
-            position: relative;
-            padding-bottom: 15px;
-            margin-bottom: 40px;
-            text-align: center;
-            font-weight: 800;
-            font-size: 2rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 4px;
-            background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-            box-shadow: 0 0 20px var(--neon-cyan);
-        }
-
-        /* === 9. SCROLL TO TOP BUTTON === */
+        /* 7. Scroll to Top Button */
         .scroll-top-btn {
             position: fixed;
             bottom: 30px;
             right: 30px;
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, var(--neon-cyan), #0088ff);
-            border: 2px solid var(--neon-cyan);
+            background: linear-gradient(135deg, #66fcf1, #0088ff);
+            border: 2px solid #66fcf1;
             border-radius: 50%;
             display: none;
             align-items: center;
@@ -525,7 +477,7 @@
             font-size: 20px;
         }
 
-        /* === 10. LOADING OVERLAY === */
+        /* 8. Loading Overlay */
         .loading-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -548,7 +500,7 @@
             width: 60px;
             height: 60px;
             border: 4px solid rgba(0, 243, 255, 0.2);
-            border-top-color: var(--neon-cyan);
+            border-top-color: #66fcf1;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -644,7 +596,7 @@
                 <img th:src="${b.imageUrl}" class="d-block w-100" alt="Banner">
             </a>
             <div class="carousel-caption d-none d-md-block">
-                <h2 th:text="${b.title}" style="color: var(--neon-cyan); text-transform: uppercase; font-weight: 800;">Tiêu Đề</h2>
+                <h2 th:text="${b.title}">Tiêu Đề</h2>
                 <button class="hero-btn mt-2" onclick="scrollToShop()">Xem Ngay</button>
             </div>
         </div>
@@ -720,7 +672,7 @@
 
 <!-- News Section -->
 <div class="container mt-5 pt-5 animate__animated animate__fadeInUp" th:if="${newsList != null and !newsList.isEmpty()}">
-    <h2 class="section-title" style="color: var(--neon-pink); text-shadow: 0 0 20px var(--neon-pink);">📰 TIN TỨC & SỰ KIỆN</h2>
+    <h2 class="section-title" style="color: #ff006e; text-shadow: 0 0 20px #ff006e;">📰 TIN TỨC & SỰ KIỆN</h2>
     <div class="news-grid">
         <div class="news-card" th:each="news : ${newsList}">
             <img th:src="${news.thumbnail}" class="news-thumb">
@@ -728,7 +680,7 @@
                 <div class="news-title" th:text="${news.title}">Tiêu đề tin tức</div>
                 <div class="d-flex justify-content-between align-items-center mt-auto">
                     <span class="news-date"><i class="far fa-clock"></i> <span th:text="${#temporals.format(news.publishedAt, 'dd/MM/yyyy')}"></span></span>
-                    <a th:href="@{/news/{id}(id=${news.newsId})}" style="color: var(--neon-cyan); font-size: 13px; font-weight: bold;">Xem thêm &rarr;</a>
+                    <a th:href="@{/news/{id}(id=${news.newsId})}" style="color: #66fcf1; font-size: 13px; font-weight: bold;">Xem thêm &rarr;</a>
                 </div>
             </div>
         </div>
@@ -747,17 +699,17 @@
                 <p class="small mb-3" style="color: #9ca9b8;">Cấp ngày 05/08/2025 bởi Sở KH&ĐT TP. Hà Nội</p>
 
                 <div class="bct-badge">
-                    <i class="fas fa-check-circle" style="color: var(--neon-cyan);"></i> ĐÃ THÔNG BÁO BỘ CÔNG THƯƠNG
+                    <i class="fas fa-check-circle" style="color: #66fcf1;"></i> ĐÃ THÔNG BÁO BỘ CÔNG THƯƠNG
                 </div>
             </div>
 
             <!-- Contact Info -->
             <div class="col-lg-4 mb-4">
-                <h5 class="footer-heading">Liên Hệ</h5>
+                <h5 class="footer-heading">LIÊN HỆ</h5>
                 <ul class="list-unstyled contact-info">
                     <li><i class="fas fa-map-marker-alt"></i> <span>25 Vũ Ngọc Phan, Láng Hạ, Đống Đa, Hà Nội</span></li>
-                    <li><i class="fas fa-phone"></i> <span>0357.335.092 (8:00 - 21:00)</span></li>
-                    <li><i class="fas fa-envelope"></i> <span>realsteelworld2k5@gmail.com</span></li>
+                    <li><i class="fas fa-phone"></i> <span>0987.654.321 (8:00 - 21:00)</span></li>
+                    <li><i class="fas fa-envelope"></i> <span>hotro@nxvshop.vn</span></li>
                 </ul>
 
                 <h6 class="text-white text-uppercase fw-bold mt-4 mb-3" style="font-size: 13px; letter-spacing: 1.5px;">ĐĂNG KÝ NHẬN TIN</h6>
@@ -782,7 +734,7 @@
             <!-- Social Connect -->
             <div class="col-lg-2 mb-4">
                 <h5 class="footer-heading">KẾT NỐI</h5>
-                <div class="bg-white p-3 rounded text-center mb-3" style="border: 2px solid var(--neon-cyan); background: rgba(255,255,255,0.95) !important;">
+                <div class="bg-white p-3 rounded text-center mb-3" style="border: 2px solid #66fcf1; background: rgba(255,255,255,0.95) !important;">
                     <a href="#" class="text-dark fw-bold text-decoration-none d-block">
                         <i class="fab fa-facebook fa-2x text-primary mb-2"></i><br>
                         <span style="font-size: 14px;">NXV BlindBox</span>
@@ -801,7 +753,7 @@
         <hr style="border-color: rgba(0, 243, 255, 0.2); margin-top: 40px; margin-bottom: 25px;">
         <div class="text-center pt-2 d-flex justify-content-between align-items-center flex-wrap">
             <p class="small mb-0" style="color: #8a97a8;">&copy; 2025 Mystery Box Shop. All rights reserved.</p>
-            <p class="small mb-0" style="color: #8a97a8;">Design & Developed by <span style="color: var(--neon-cyan); font-weight: bold;">Nguyen Xuan Vinh</span>.</p>
+            <p class="small mb-0" style="color: #8a97a8;">Design & Developed by <span style="color: #66fcf1; font-weight: bold;">Nguyen Xuan Vinh</span>.</p>
         </div>
     </div>
 </footer>
@@ -817,7 +769,6 @@
 <script th:inline="javascript">
 
     // === PAGE LOADING ===
-    // Ẩn loading ngay khi DOM ready (không chờ tất cả resources)
     document.addEventListener('DOMContentLoaded', function() {
         const loadingOverlay = document.getElementById('loadingOverlay');
         if (loadingOverlay) {
@@ -827,7 +778,6 @@
         }
     });
 
-    // Backup: Ẩn loading sau window load (nếu DOMContentLoaded không trigger)
     window.addEventListener('load', function() {
         const loadingOverlay = document.getElementById('loadingOverlay');
         if (loadingOverlay && !loadingOverlay.classList.contains('hidden')) {
@@ -835,7 +785,6 @@
         }
     });
 
-    // Safety: Force ẩn loading sau 2 giây (tránh trường hợp bị kẹt)
     setTimeout(() => {
         const loadingOverlay = document.getElementById('loadingOverlay');
         if (loadingOverlay) {
@@ -879,10 +828,10 @@
                     loopData.forEach(w => {
                         html += `
                             <span class="winner-item">
-                                <i class="fas fa-bullhorn" style="color: var(--neon-cyan);"></i>
+                                <i class="fas fa-bullhorn" style="color: #66fcf1;"></i>
                                 Chúc mừng <span class="winner-highlight">${w.user}</span>
                                 đã mở ra <span class="rank-tag">RANK S</span>
-                                <span style="color: var(--neon-gold);">${w.item}</span>
+                                <span style="color: #ffd700;">${w.item}</span>
                                 trong hộp ${w.box}!
                             </span>
                         `;
@@ -938,7 +887,7 @@
                     timer: 2000,
                     background: 'linear-gradient(135deg, #0a0e27, #1a1f3a)',
                     color: '#fff',
-                    iconColor: var(--neon-cyan)
+                    iconColor: '#66fcf1'
                 });
                 Toast.fire({ icon: 'success', title: '✅ Đã thêm vào giỏ!' });
             }
@@ -963,9 +912,9 @@
         let pityHtml = "";
         if (data.rarity !== 'S') {
             pityHtml = `<div style="margin-top: 20px; padding: 15px; background: rgba(0, 243, 255, 0.05); border-radius: 10px; border: 2px dashed ${color};">
-                            <i class="fas fa-shield-alt" style="color: var(--neon-cyan);"></i>
+                            <i class="fas fa-shield-alt" style="color: #66fcf1;"></i>
                             <span style="color: #b8c5d6; font-size: 14px;">Bảo hiểm S:</span>
-                            <b style="color: var(--neon-cyan); font-size: 18px;"> ${data.spinsUntilPity} </b>
+                            <b style="color: #66fcf1; font-size: 18px;"> ${data.spinsUntilPity} </b>
                             <span style="color: #b8c5d6; font-size: 14px;">lần nữa</span>
                         </div>`;
         } else {
@@ -985,7 +934,7 @@
                                 background: linear-gradient(135deg, rgba(15, 20, 35, 0.95), rgba(10, 14, 39, 0.95));">
                     <h3 style="color: #fff; text-transform: uppercase; margin: 15px 0 5px 0; font-weight: 800; letter-spacing: 1px;">${data.itemName}</h3>
                     <div style="font-size: 14px; color: #b8c5d6; margin-top: 10px;">
-                        Số dư còn lại: <span style="color: var(--neon-cyan); font-weight: bold; font-size: 16px;">${new Intl.NumberFormat('en-US').format(data.currentBalance)} đ</span>
+                        Số dư còn lại: <span style="color: #66fcf1; font-weight: bold; font-size: 16px;">${new Intl.NumberFormat('en-US').format(data.currentBalance)} đ</span>
                     </div>
                     ${pityHtml}
                 </div>
@@ -1017,7 +966,7 @@
             showCancelButton: true,
             background: 'linear-gradient(135deg, #0a0e27, #1a1f3a)',
             color: '#fff',
-            confirmButtonColor: var(--neon-cyan),
+            confirmButtonColor: '#66fcf1',
             cancelButtonColor: '#333'
         }).then((res) => {
             if(res.isConfirmed) window.location.href='/login';

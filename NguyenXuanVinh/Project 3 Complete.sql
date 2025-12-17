@@ -469,3 +469,8 @@ BEGIN
     -- Cập nhật dữ liệu cũ (lấy giá trị từ ObtainedDate sang CreatedAt)
     EXEC('UPDATE UserInventory SET CreatedAt = ObtainedDate WHERE CreatedAt IS NULL');
 END
+
+USE BlindBoxDB;
+GO
+ALTER TABLE Orders ADD Note NVARCHAR(MAX);
+GO
