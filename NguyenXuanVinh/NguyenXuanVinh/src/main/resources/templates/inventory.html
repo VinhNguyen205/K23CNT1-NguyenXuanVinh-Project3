@@ -2,106 +2,624 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Kho Đồ Của Tôi</title>
+    <title>Kho Đồ Của Tôi | Mystery Box</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="/css/style.css">
 
     <style>
-        /* CSS Riêng cho trang Inventory (Bổ sung thêm hiệu ứng đẹp hơn global) */
+        /* === PREMIUM INVENTORY PAGE === */
 
-        /* Hiệu ứng Rank Badge Góc */
-        .rank-badge-corner {
-            position: absolute; top: 0; left: 0;
-            padding: 5px 15px;
-            border-bottom-right-radius: 15px;
-            font-weight: 900; font-size: 14px;
-            color: #000; z-index: 2;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
-            text-transform: uppercase;
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        /* Màu Rank chuẩn game */
-        .rank-S { background: linear-gradient(45deg, #ffd700, #fffa65); }
-        .rank-A { background: linear-gradient(45deg, #ff4757, #ff6b81); color: #fff; }
-        .rank-B { background: linear-gradient(45deg, #9b59b6, #a55eea); color: #fff; }
-        .rank-C { background: linear-gradient(45deg, #3498db, #48dbfb); color: #fff; }
-        .rank-D { background: linear-gradient(45deg, #95a5a6, #bdc3c7); color: #333; }
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(102, 252, 241, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(46, 204, 113, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
 
-        /* Card Sản Phẩm */
-        .box-card {
-            background: rgba(30, 30, 40, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* === PREMIUM HEADER === */
+        .inventory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 40px 0 50px 0;
+            padding: 32px 40px;
+            background: rgba(15, 20, 35, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(102, 252, 241, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .inventory-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, transparent, #66fcf1, #2ecc71, transparent);
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .inventory-title {
+            font-size: 36px;
+            font-weight: 900;
+            color: #fff;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .inventory-title i {
+            font-size: 40px;
+            color: #66fcf1;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Action Buttons Group */
+        .btn-action-group {
+            display: flex;
+            gap: 16px;
+        }
+
+        .btn-history {
+            padding: 14px 28px;
+            background: rgba(102, 252, 241, 0.1);
+            border: 2px solid #66fcf1;
+            color: #66fcf1;
+            border-radius: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-history:hover {
+            background: rgba(102, 252, 241, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(102, 252, 241, 0.3);
+            color: #fff;
+        }
+
+        .btn-ship-request {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            border: none;
+            color: #000;
+            border-radius: 12px;
+            font-weight: 800;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 8px 24px rgba(46, 204, 113, 0.4);
+            animation: pulse-green 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 8px 24px rgba(46, 204, 113, 0.4); }
+            50% { box-shadow: 0 8px 32px rgba(46, 204, 113, 0.6), 0 0 40px rgba(46, 204, 113, 0.3); }
+        }
+
+        .btn-ship-request:hover {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 32px rgba(46, 204, 113, 0.6);
+        }
+
+        /* === STATS BAR === */
+        .inventory-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(15, 20, 35, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(102, 252, 241, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: var(--accent-color);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+            box-shadow: 0 12px 32px rgba(102, 252, 241, 0.2);
+        }
+
+        .stat-card.cyan { --accent-color: #66fcf1; }
+        .stat-card.gold { --accent-color: #ffd700; }
+        .stat-card.purple { --accent-color: #a855f7; }
+        .stat-card.green { --accent-color: #2ecc71; }
+
+        .stat-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+            color: var(--accent-color);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        /* === PREMIUM ITEMS GRID === */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        /* Premium Item Card */
+        .item-card {
+            background: rgba(15, 20, 35, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(102, 252, 241, 0.2);
+            border-radius: 16px;
             overflow: hidden;
             position: relative;
-            transition: 0.3s;
-            display: flex; flex-direction: column;
-            backdrop-filter: blur(5px);
-        }
-        .box-card:hover {
-            border-color: var(--neon-cyan);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(102, 252, 241, 0.15);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Ảnh sản phẩm */
-        .box-image {
-            padding: 20px;
-            background: radial-gradient(circle, #2c3e50 0%, #0b0c10 100%);
-            text-align: center;
-            height: 200px;
-            display: flex; align-items: center; justify-content: center;
+        .item-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(102, 252, 241, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 0;
         }
-        .box-image img {
-            max-width: 100%; max-height: 100%;
+
+        .item-card:hover {
+            transform: translateY(-10px);
+            border-color: #66fcf1;
+            box-shadow: 0 20px 50px rgba(102, 252, 241, 0.3);
+        }
+
+        .item-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Rank Badge - Corner Design */
+        .rank-badge {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 8px 20px;
+            font-weight: 900;
+            font-size: 16px;
+            z-index: 10;
+            border-bottom-right-radius: 16px;
+            box-shadow: 4px 4px 16px rgba(0, 0, 0, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .rank-S {
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            color: #000;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+        }
+        .rank-A {
+            background: linear-gradient(135deg, #ff4757, #ff6b81);
+            color: #fff;
+            box-shadow: 0 0 30px rgba(255, 71, 87, 0.6);
+        }
+        .rank-B {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: #fff;
+            box-shadow: 0 0 30px rgba(155, 89, 182, 0.6);
+        }
+        .rank-C {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+            box-shadow: 0 0 30px rgba(52, 152, 219, 0.6);
+        }
+        .rank-D {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            color: #fff;
+            box-shadow: 0 0 30px rgba(149, 165, 166, 0.6);
+        }
+
+        /* Item Image Container */
+        .item-image-wrapper {
+            height: 240px;
+            background: radial-gradient(circle at center, rgba(44, 62, 80, 0.3), rgba(11, 12, 16, 0.9));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .item-image-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(102, 252, 241, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .item-card:hover .item-image-wrapper::before {
+            opacity: 1;
+        }
+
+        .item-image {
+            max-width: 100%;
+            max-height: 100%;
             object-fit: contain;
-            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
-            transition: 0.3s;
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5));
+            transition: all 0.4s ease;
+            position: relative;
+            z-index: 1;
         }
-        .box-card:hover .box-image img { transform: scale(1.1) rotate(3deg); }
 
-        /* Thông tin sản phẩm */
-        .box-info {
-            padding: 15px;
-            background: rgba(11, 12, 16, 0.9);
+        .item-card:hover .item-image {
+            transform: scale(1.15) rotate(3deg);
+        }
+
+        /* Item Info Section */
+        .item-info {
+            padding: 20px;
+            background: rgba(11, 12, 16, 0.95);
             flex-grow: 1;
-            display: flex; flex-direction: column; justify-content: space-between;
-            border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
         }
 
         .item-name {
-            color: #fff; font-weight: 700; margin-bottom: 5px;
+            color: #fff;
+            font-weight: 700;
             font-size: 16px;
-            overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+            line-height: 1.4;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
         }
 
-        .market-price {
-            color: #aaa; font-size: 13px; margin-bottom: 15px;
+        .item-value {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            margin-bottom: 8px;
         }
 
-        /* Nút Bán Lại */
+        .value-label {
+            font-size: 12px;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .value-amount {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Sell Button Premium */
         .btn-sell {
             width: 100%;
+            padding: 14px;
             background: rgba(46, 204, 113, 0.1);
-            border: 1px solid #2ecc71;
+            border: 2px solid #2ecc71;
             color: #2ecc71;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 600; font-size: 13px;
-            transition: 0.3s; cursor: pointer;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 14px;
             text-transform: uppercase;
-            display: flex; align-items: center; justify-content: center; gap: 5px;
+            letter-spacing: 0.5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
         }
+
+        .btn-sell::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(46, 204, 113, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .btn-sell:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-sell span {
+            position: relative;
+            z-index: 1;
+        }
+
         .btn-sell:hover {
-            background: #2ecc71; color: #000;
-            box-shadow: 0 0 15px rgba(46, 204, 113, 0.6);
+            background: #2ecc71;
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(46, 204, 113, 0.5);
+        }
+
+        /* === EMPTY STATE === */
+        .empty-state {
+            text-align: center;
+            padding: 100px 20px;
+            background: rgba(15, 20, 35, 0.6);
+            backdrop-filter: blur(10px);
+            border: 2px dashed rgba(139, 148, 158, 0.3);
+            border-radius: 24px;
+            margin: 60px 0;
+        }
+
+        .empty-icon {
+            font-size: 120px;
+            color: #8b949e;
+            opacity: 0.3;
+            margin-bottom: 32px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .empty-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+
+        .empty-text {
+            font-size: 18px;
+            color: #8b949e;
+            margin-bottom: 40px;
+        }
+
+        .btn-go-shop {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #66fcf1, #45a29e);
+            color: #000;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 16px;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(102, 252, 241, 0.4);
+        }
+
+        .btn-go-shop:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(102, 252, 241, 0.6);
+            color: #000;
+        }
+
+        /* === FILTER & SORT BAR === */
+        .filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding: 20px 28px;
+            background: rgba(15, 20, 35, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(102, 252, 241, 0.2);
+            border-radius: 16px;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .rank-filters {
+            display: flex;
+            gap: 12px;
+        }
+
+        .rank-filter-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #8b949e;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .rank-filter-btn:hover,
+        .rank-filter-btn.active {
+            border-color: #66fcf1;
+            color: #66fcf1;
+            background: rgba(102, 252, 241, 0.1);
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 1200px) {
+            .inventory-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .inventory-header {
+                flex-direction: column;
+                gap: 24px;
+                text-align: center;
+            }
+
+            .btn-action-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-history,
+            .btn-ship-request {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .inventory-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .inventory-title {
+                font-size: 28px;
+            }
+
+            .items-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .rank-filters {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        /* === ANIMATIONS === */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+
+        /* Delete Animation */
+        .deleting {
+            animation: deleteOut 0.5s ease-out forwards;
+        }
+
+        @keyframes deleteOut {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
         }
     </style>
 </head>
 <body>
 
+<!-- Header -->
 <header>
     <div class="logo">
         <a href="/" style="text-decoration:none; color:#66fcf1;">
@@ -147,47 +665,114 @@
     </div>
 </header>
 
-<div class="container mt-5">
+<!-- Main Content -->
+<div class="container">
 
-    <div class="inventory-header">
-        <h2 class="inventory-title"><i class="fas fa-box-open"></i> Kho Đồ Của Tôi</h2>
+    <!-- Page Header -->
+    <div class="inventory-header animate__animated animate__fadeInDown">
+        <h2 class="inventory-title">
+            <i class="fas fa-box-open"></i>
+            <span>Kho Đồ Của Tôi</span>
+        </h2>
 
         <div class="btn-action-group">
             <a href="/shipment/history" class="btn-history">
-                <i class="fas fa-history"></i> Lịch Sử Giao Hàng
+                <i class="fas fa-history"></i>
+                <span>Lịch Sử</span>
             </a>
 
             <a href="/shipment/create" class="btn-ship-request" th:if="${!inventoryList.isEmpty()}">
-                <i class="fas fa-truck-fast"></i> YÊU CẦU GIAO HÀNG
+                <i class="fas fa-truck-fast"></i>
+                <span>Yêu Cầu Giao Hàng</span>
             </a>
         </div>
     </div>
 
-    <div th:if="${inventoryList.isEmpty()}" class="text-center text-muted mt-5">
-        <i class="fas fa-ghost fa-4x mb-3" style="color: #444;"></i>
-        <h3>Kho trống trơn!</h3>
-        <p>Hãy ra trang chủ mở hộp để kiếm vật phẩm xịn nhé.</p>
-        <a href="/" class="btn-buy mt-3" style="display:inline-block; width:auto; padding: 10px 30px;">Đi Săn Ngay</a>
+    <!-- Stats Bar -->
+    <div class="inventory-stats animate__animated animate__fadeInUp" th:if="${!inventoryList.isEmpty()}">
+        <div class="stat-card cyan">
+            <div class="stat-icon"><i class="fas fa-box-open"></i></div>
+            <div class="stat-label">Tổng Vật Phẩm</div>
+            <div class="stat-value" th:text="${inventoryList.size()}">0</div>
+        </div>
+        <div class="stat-card gold">
+            <div class="stat-icon"><i class="fas fa-coins"></i></div>
+            <div class="stat-label">Tổng Giá Trị</div>
+            <div class="stat-value" id="totalValue">
+                <span style="font-size: 16px; color: #8b949e;"> đ</span>
+            </div>
+        </div>
+        <div class="stat-card purple">
+            <div class="stat-icon"><i class="fas fa-crown"></i></div>
+            <div class="stat-label">Vật Phẩm Hiếm</div>
+            <div class="stat-value" id="rareItems">0</div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon"><i class="fas fa-hand-holding-dollar"></i></div>
+            <div class="stat-label">Có Thể Bán</div>
+            <div class="stat-value" id="sellValue">
+                <span style="font-size: 16px; color: #8b949e;"> đ</span>
+            </div>
+        </div>
     </div>
 
-    <div class="box-grid">
-        <div class="box-card" th:each="item : ${inventoryList}" th:id="'card-' + ${item.inventoryId}">
-            <div class="rank-badge-corner"
-                 th:classappend="'rank-' + ${item.boxItem.rarityLevel}"
-                 th:text="${item.boxItem.rarityLevel}">S</div>
+    <!-- Filter Bar -->
+    <div class="filter-bar animate__animated animate__fadeInUp" th:if="${!inventoryList.isEmpty()}" style="animation-delay: 0.1s;">
+        <div class="filter-label">Lọc Theo Rank:</div>
+        <div class="rank-filters">
+            <button class="rank-filter-btn active" onclick="filterRank('all')">Tất Cả</button>
+            <button class="rank-filter-btn" onclick="filterRank('S')">S</button>
+            <button class="rank-filter-btn" onclick="filterRank('A')">A</button>
+            <button class="rank-filter-btn" onclick="filterRank('B')">B</button>
+            <button class="rank-filter-btn" onclick="filterRank('C')">C</button>
+            <button class="rank-filter-btn" onclick="filterRank('D')">D</button>
+        </div>
+    </div>
 
-            <div class="box-image">
-                <img th:src="${item.boxItem.imageUrl}" alt="Item Image">
+    <!-- Empty State -->
+    <div th:if="${inventoryList.isEmpty()}" class="empty-state animate__animated animate__zoomIn">
+        <div class="empty-icon">
+            <i class="fas fa-ghost"></i>
+        </div>
+        <h3 class="empty-title">Kho Trống Trơn!</h3>
+        <p class="empty-text">Hãy ra trang chủ mở hộp để kiếm vật phẩm xịn nhé</p>
+        <a href="/" class="btn-go-shop">
+            <i class="fas fa-magic"></i>
+            <span>Đi Săn Ngay</span>
+        </a>
+    </div>
+
+    <!-- Items Grid -->
+    <div class="items-grid" id="itemsGrid">
+        <div class="item-card animate__animated animate__fadeInUp"
+             th:each="item, iter : ${inventoryList}"
+             th:id="'card-' + ${item.inventoryId}"
+             th:data-rank="${item.boxItem.rarityLevel}"
+             th:style="'animation-delay: ' + ${iter.index * 0.05} + 's'">
+
+            <div class="rank-badge"
+                 th:classappend="'rank-' + ${item.boxItem.rarityLevel}"
+                 th:text="${item.boxItem.rarityLevel}">
+                S
             </div>
 
-            <div class="box-info">
-                <div>
-                    <div class="item-name" th:text="${item.boxItem.itemName}">Item Name</div>
-                    <div class="market-price">Giá trị thực: <b class="text-light" th:text="${#numbers.formatDecimal(item.boxItem.marketValue, 0, 'COMMA', 0, 'POINT')}">0</b> đ</div>
+            <div class="item-image-wrapper">
+                <img th:src="${item.boxItem.imageUrl}" alt="Item Image" class="item-image">
+            </div>
+
+            <div class="item-info">
+                <div class="item-name" th:text="${item.boxItem.itemName}">Item Name</div>
+
+                <div class="item-value">
+                    <span class="value-label">Giá Trị</span>
+                    <span class="value-amount">
+                        <span th:text="${#numbers.formatDecimal(item.boxItem.marketValue, 0, 'COMMA', 0, 'POINT')}">0</span> đ
+                    </span>
                 </div>
 
-                <button class="btn-sell" th:onclick="'sellItem(' + ${item.inventoryId} + ')'">
-                    <i class="fas fa-hand-holding-dollar"></i> BÁN LẠI (90%)
+                <button class="btn-sell" th:onclick="'sellItem(' + ${item.inventoryId} + ', ' + ${item.boxItem.marketValue} + ')'">
+                    <i class="fas fa-hand-holding-dollar"></i>
+                    <span>Bán Lại (90%)</span>
                 </button>
             </div>
         </div>
@@ -198,60 +783,191 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script th:inline="javascript">
-    function sellItem(inventoryId) {
-        const userId = [[${nxvUser.userId}]];
+    const userId = [[${nxvUser.userId}]];
+
+    // Calculate and display stats
+    document.addEventListener('DOMContentLoaded', function() {
+        const inventoryData = /*[[${inventoryList}]]*/ [];
+
+        if (inventoryData && inventoryData.length > 0) {
+            // Calculate total value
+            let totalValue = 0;
+            let rareCount = 0;
+            let sellValue = 0;
+
+            inventoryData.forEach(item => {
+                const marketValue = item.boxItem.marketValue;
+                totalValue += marketValue;
+                sellValue += marketValue * 0.9;
+
+                if (item.boxItem.rarityLevel === 'S' || item.boxItem.rarityLevel === 'A') {
+                    rareCount++;
+                }
+            });
+
+            // Update display
+            const totalValueEl = document.getElementById('totalValue');
+            if (totalValueEl) {
+                totalValueEl.innerHTML = `<span>${new Intl.NumberFormat('en-US').format(totalValue)}</span><span style="font-size: 16px; color: #8b949e;"> đ</span>`;
+            }
+
+            const rareItemsEl = document.getElementById('rareItems');
+            if (rareItemsEl) {
+                rareItemsEl.textContent = rareCount;
+            }
+
+            const sellValueEl = document.getElementById('sellValue');
+            if (sellValueEl) {
+                sellValueEl.innerHTML = `<span>${new Intl.NumberFormat('en-US').format(Math.floor(sellValue))}</span><span style="font-size: 16px; color: #8b949e;"> đ</span>`;
+            }
+        }
+    });
+
+    // Filter by rank
+    function filterRank(rank) {
+        const cards = document.querySelectorAll('.item-card');
+        const buttons = document.querySelectorAll('.rank-filter-btn');
+
+        // Update active button
+        buttons.forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        // Filter cards
+        cards.forEach(card => {
+            const cardRank = card.getAttribute('data-rank');
+            if (rank === 'all' || cardRank === rank) {
+                card.style.display = 'flex';
+                card.classList.add('animate__fadeIn');
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // Sell item function
+    function sellItem(inventoryId, marketValue) {
+        const sellPrice = Math.floor(marketValue * 0.9);
+        const formattedSellPrice = new Intl.NumberFormat('vi-VN').format(sellPrice);
 
         Swal.fire({
-            title: 'Bán vật phẩm này?',
-            text: "Bạn sẽ nhận lại 90% giá trị thực của vật phẩm vào ví.",
+            title: '<div style="color: #fff; font-weight: 800;">💰 Bán Vật Phẩm?</div>',
+            html: `
+                <div style="padding: 20px; text-align: center;">
+                    <p style="color: #b8c5d6; font-size: 16px; margin-bottom: 20px;">
+                        Bạn sẽ nhận được <span style="color: #2ecc71; font-weight: 800; font-size: 20px;">${formattedSellPrice} đ</span> (90% giá trị)
+                    </p>
+                    <div style="padding: 16px; background: rgba(46, 204, 113, 0.1); border: 2px dashed #2ecc71; border-radius: 12px; margin-top: 16px;">
+                        <i class="fas fa-info-circle" style="color: #2ecc71;"></i>
+                        <span style="color: #8b949e; font-size: 13px;"> Số tiền sẽ được thêm ngay vào ví</span>
+                    </div>
+                </div>
+            `,
             icon: 'question',
             showCancelButton: true,
+            confirmButtonText: '<i class="fas fa-check me-2"></i> Đồng Ý Bán',
+            cancelButtonText: '<i class="fas fa-times me-2"></i> Giữ Lại',
             confirmButtonColor: '#2ecc71',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Đồng ý bán',
-            cancelButtonText: 'Giữ lại',
-            background: '#1f2833', color: '#fff'
+            cancelButtonColor: '#6c757d',
+            background: 'linear-gradient(135deg, #0a0e27, #1a1f3a)',
+            color: '#fff',
+            customClass: {
+                popup: 'animate__animated animate__zoomIn'
+            }
         }).then((result) => {
             if (result.isConfirmed) {
-                // Gọi API Bán hàng
+                // Show loading
+                Swal.fire({
+                    title: 'Đang Xử Lý...',
+                    html: 'Vui lòng chờ trong giây lát',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    background: 'linear-gradient(135deg, #0a0e27, #1a1f3a)',
+                    color: '#fff',
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Call API
                 fetch(`/api/blindbox/sell?userId=${userId}&inventoryId=${inventoryId}`, { method: 'POST' })
                 .then(response => {
                     if (!response.ok) throw new Error("Lỗi bán hàng!");
                     return response.json();
                 })
                 .then(data => {
-                    // 1. Thông báo thành công
-                    const Toast = Swal.mixin({
-                        toast: true, position: 'top-end', showConfirmButton: false, timer: 3000,
-                        background: '#1f2833', color: '#fff', iconColor: '#2ecc71'
+                    // Success notification
+                    Swal.fire({
+                        title: '<div style="color: #2ecc71; font-weight: 800;">✅ Bán Thành Công!</div>',
+                        html: `
+                            <div style="padding: 20px; text-align: center;">
+                                <div style="font-size: 48px; margin-bottom: 20px;">💰</div>
+                                <p style="color: #b8c5d6; font-size: 16px; margin-bottom: 12px;">
+                                    Bạn đã nhận được
+                                </p>
+                                <p style="color: #2ecc71; font-weight: 900; font-size: 32px; margin-bottom: 20px;">
+                                    +${formattedSellPrice} đ
+                                </p>
+                                <div style="padding: 12px; background: rgba(102, 252, 241, 0.1); border-radius: 10px;">
+                                    <span style="color: #8b949e; font-size: 14px;">Số dư mới: </span>
+                                    <span style="color: #66fcf1; font-weight: 700; font-size: 16px;">${new Intl.NumberFormat('vi-VN').format(data.newBalance)} đ</span>
+                                </div>
+                            </div>
+                        `,
+                        icon: 'success',
+                        confirmButtonText: 'Tuyệt Vời!',
+                        confirmButtonColor: '#2ecc71',
+                        background: 'linear-gradient(135deg, #0a0e27, #1a1f3a)',
+                        color: '#fff',
+                        timer: 3000,
+                        timerProgressBar: true,
+                        customClass: {
+                            popup: 'animate__animated animate__bounceIn'
+                        }
                     });
-                    Toast.fire({ icon: 'success', title: data.message });
 
-                    // 2. Xóa Card Item ngay lập tức (Hiệu ứng mờ dần)
-                    let card = document.getElementById('card-' + inventoryId);
-                    card.style.transition = "all 0.5s";
-                    card.style.opacity = "0";
-                    card.style.transform = "scale(0.8)";
+                    // Remove card with animation
+                    const card = document.getElementById('card-' + inventoryId);
+                    card.classList.add('deleting');
                     setTimeout(() => {
                         card.remove();
-                        // Nếu kho hết đồ thì reload
-                        if(document.querySelectorAll('.box-card').length === 0) location.reload();
+                        // Reload if empty
+                        if(document.querySelectorAll('.item-card').length === 0) {
+                            location.reload();
+                        }
                     }, 500);
 
-                    // 3. Cập nhật số dư NGAY LẬP TỨC (Fix delay)
-                    // Format số tiền kiểu Việt Nam (1.000.000)
-                    let newBalanceFormatted = new Intl.NumberFormat('en-US').format(data.newBalance);
-                    // Tìm tất cả chỗ hiển thị số dư để update (Header + Dropdown)
+                    // Update wallet balance
+                    const newBalanceFormatted = new Intl.NumberFormat('en-US').format(data.newBalance);
                     document.querySelectorAll('#wallet-balance').forEach(el => {
                         el.innerText = newBalanceFormatted;
                     });
                 })
                 .catch(() => {
-                    Swal.fire({ title: 'Lỗi!', text: 'Không thể thực hiện giao dịch.', icon: 'error', background: '#1f2833', color: '#fff' });
+                    Swal.fire({
+                        title: 'Lỗi!',
+                        text: 'Không thể thực hiện giao dịch',
+                        icon: 'error',
+                        confirmButtonColor: '#ff4757',
+                        background: 'linear-gradient(135deg, #0a0e27, #1a1f3a)',
+                        color: '#fff'
+                    });
                 });
             }
-        })
+        });
     }
+
+    // Scroll reveal animation
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate__fadeInUp');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.item-card').forEach((el) => {
+        observer.observe(el);
+    });
 </script>
 
 </body>
