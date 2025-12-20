@@ -12,6 +12,171 @@
     <style>
         /* === ONLY PAGE-SPECIFIC ENHANCEMENTS (Not in style.css) === */
 
+        /* === PREMIUM WINNER TICKER (BELOW HEADER) === */
+        .winner-ticker {
+            background: linear-gradient(90deg, #0a0e27, #1a1f3a, #0a0e27);
+            border-top: 2px solid rgba(102, 252, 241, 0.3);
+            border-bottom: 3px solid rgba(102, 252, 241, 0.5);
+            color: #fff;
+            font-size: 15px;
+            padding: 18px 0;
+            overflow: hidden;
+            position: relative;
+            white-space: nowrap;
+            box-shadow:
+                0 4px 20px rgba(0, 243, 255, 0.2),
+                inset 0 1px 0 rgba(102, 252, 241, 0.1),
+                0 -1px 0 rgba(102, 252, 241, 0.1);
+            margin-bottom: 30px;
+            z-index: 999;
+        }
+
+        .winner-ticker::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 200%; height: 100%;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(102, 252, 241, 0.05) 25%,
+                rgba(102, 252, 241, 0.1) 50%,
+                rgba(102, 252, 241, 0.05) 75%,
+                transparent 100%
+            );
+            animation: shimmer-slide 4s linear infinite;
+        }
+
+        @keyframes shimmer-slide {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .ticker-wrapper {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ticker-content {
+            display: inline-block;
+            white-space: nowrap;
+            padding-left: 100%;
+            animation: ticker 40s linear infinite;
+            will-change: transform;
+        }
+
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+
+        .ticker-content:hover {
+            animation-play-state: paused;
+        }
+
+        .winner-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-right: 80px;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, rgba(102, 252, 241, 0.08), rgba(102, 252, 241, 0.03));
+            border: 1px solid rgba(102, 252, 241, 0.2);
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .winner-item::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, #66fcf1, #a855f7);
+            border-radius: 30px;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+        }
+
+        .winner-item:hover::before {
+            opacity: 0.2;
+        }
+
+        .winner-item:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, rgba(102, 252, 241, 0.15), rgba(102, 252, 241, 0.08));
+            border-color: #66fcf1;
+            box-shadow: 0 4px 16px rgba(102, 252, 241, 0.3);
+        }
+
+        .winner-icon {
+            color: #66fcf1;
+            font-size: 18px;
+            animation: pulse-icon 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 5px #66fcf1);
+        }
+
+        @keyframes pulse-icon {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0.8; }
+        }
+
+        .winner-highlight {
+            color: #ffd700;
+            font-weight: 800;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            padding: 0 6px;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), transparent);
+            border-radius: 4px;
+        }
+
+        .winner-item:hover .winner-highlight {
+            color: #fff;
+            text-shadow: 0 0 15px #ffd700, 0 0 30px #ffd700;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.05));
+        }
+
+        .rank-tag {
+            background: linear-gradient(135deg, #ff006e, #ff4757);
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 11px;
+            margin: 0 4px;
+            box-shadow: 0 0 15px rgba(255, 0, 110, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            animation: glow-rank 2s ease-in-out infinite;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes glow-rank {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(255, 0, 110, 0.4);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(255, 0, 110, 0.8), 0 0 30px rgba(255, 0, 110, 0.4);
+                transform: scale(1.05);
+            }
+        }
+
+        .winner-box-name {
+            color: #a855f7;
+            font-weight: 600;
+            font-style: italic;
+            text-shadow: 0 0 5px rgba(168, 85, 247, 0.3);
+        }
+
+        .winner-item-name {
+            color: #ffd700;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+        }
+
         /* 1. Carousel Enhancements */
         .carousel-item {
             height: 550px;
@@ -183,76 +348,7 @@
             border-color: #CD7F32;
         }
 
-        /* 4. Winner Ticker Enhanced */
-        .winner-ticker {
-            background: linear-gradient(90deg, #0a0e27, #1a1f3a, #0a0e27);
-            border-bottom: 2px solid #66fcf1;
-            color: #fff;
-            font-size: 14px;
-            padding: 12px 0;
-            overflow: hidden;
-            position: relative;
-            z-index: 9999;
-            white-space: nowrap;
-            box-shadow: 0 4px 20px rgba(0, 243, 255, 0.3);
-        }
-
-        .winner-ticker::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.1), transparent);
-            animation: shimmer 3s linear infinite;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-
-        .ticker-wrapper { width: 100%; overflow: hidden; }
-
-        .ticker-content {
-            display: inline-block;
-            white-space: nowrap;
-            padding-left: 100%;
-            animation: ticker 35s linear infinite;
-        }
-
-        @keyframes ticker {
-            0% { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(-100%, 0, 0); }
-        }
-
-        .winner-item {
-            display: inline-block;
-            margin-right: 60px;
-            padding: 5px 15px;
-            background: rgba(0, 243, 255, 0.05);
-            border-radius: 20px;
-        }
-
-        .winner-highlight {
-            color: #ffd700;
-            font-weight: bold;
-            text-shadow: 0 0 10px #ffd700;
-        }
-
-        .rank-tag {
-            background: linear-gradient(135deg, #ff006e, #ff4757);
-            color: #fff;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 11px;
-            margin-right: 5px;
-            box-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* 5. News Card Enhancement */
+        /* 4. News Card Enhancement */
         .news-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -315,7 +411,7 @@
             color: #aaa;
         }
 
-        /* 6. Footer Premium */
+        /* 5. Footer Premium */
         .site-footer {
             background: linear-gradient(180deg, #0a0e27 0%, #050608 100%);
             border-top: 3px solid #66fcf1;
@@ -335,6 +431,11 @@
             width: 100%; height: 2px;
             background: linear-gradient(90deg, transparent, #66fcf1, #ff006e, transparent);
             animation: shimmer 4s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
         }
 
         .footer-heading {
@@ -448,7 +549,7 @@
             transform: translateY(-3px);
         }
 
-        /* 7. Scroll to Top Button */
+        /* 6. Scroll to Top Button */
         .scroll-top-btn {
             position: fixed;
             bottom: 30px;
@@ -477,7 +578,7 @@
             font-size: 20px;
         }
 
-        /* 8. Loading Overlay */
+        /* 7. Loading Overlay */
         .loading-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -517,6 +618,21 @@
             .crown-icon { font-size: 35px; }
             .top1-avatar { width: 80px; height: 80px; }
             .section-title { font-size: 1.5rem; }
+
+            .winner-ticker {
+                font-size: 13px;
+                padding: 14px 0;
+            }
+
+            .winner-item {
+                padding: 8px 16px;
+                margin-right: 50px;
+            }
+
+            .rank-tag {
+                font-size: 10px;
+                padding: 4px 8px;
+            }
         }
     </style>
 </head>
@@ -525,13 +641,6 @@
 <!-- Loading Overlay -->
 <div class="loading-overlay hidden" id="loadingOverlay" style="display: none;">
     <div class="spinner"></div>
-</div>
-
-<!-- Winner Ticker -->
-<div id="winner-bar" class="winner-ticker" style="display: none;">
-    <div class="ticker-wrapper">
-        <div class="ticker-content" id="ticker-content"></div>
-    </div>
 </div>
 
 <!-- Header -->
@@ -583,6 +692,13 @@
         <a href="/login" class="btn-buy" style="padding: 8px 25px; text-decoration: none; display: inline-block;">Đăng Nhập</a>
     </div>
 </header>
+
+<!-- ✨ PREMIUM WINNER TICKER - NOW BELOW HEADER ✨ -->
+<div id="winner-bar" class="winner-ticker" style="display: none;">
+    <div class="ticker-wrapper">
+        <div class="ticker-content" id="ticker-content"></div>
+    </div>
+</div>
 
 <!-- Carousel Banner -->
 <div th:unless="${banners == null or banners.isEmpty()}" id="homeCarousel" class="carousel slide mb-5 animate__animated animate__fadeIn" data-bs-ride="carousel">
@@ -708,8 +824,8 @@
                 <h5 class="footer-heading">LIÊN HỆ</h5>
                 <ul class="list-unstyled contact-info">
                     <li><i class="fas fa-map-marker-alt"></i> <span>25 Vũ Ngọc Phan, Láng Hạ, Đống Đa, Hà Nội</span></li>
-                    <li><i class="fas fa-phone"></i> <span>0987.654.321 (8:00 - 21:00)</span></li>
-                    <li><i class="fas fa-envelope"></i> <span>hotro@nxvshop.vn</span></li>
+                    <li><i class="fas fa-phone"></i> <span>0357.335.092 (8:00 - 21:00)</span></li>
+                    <li><i class="fas fa-envelope"></i> <span>realsteelworld2k5@gmail.com</span></li>
                 </ul>
 
                 <h6 class="text-white text-uppercase fw-bold mt-4 mb-3" style="font-size: 13px; letter-spacing: 1.5px;">ĐĂNG KÝ NHẬN TIN</h6>
@@ -753,7 +869,7 @@
         <hr style="border-color: rgba(0, 243, 255, 0.2); margin-top: 40px; margin-bottom: 25px;">
         <div class="text-center pt-2 d-flex justify-content-between align-items-center flex-wrap">
             <p class="small mb-0" style="color: #8a97a8;">&copy; 2025 Mystery Box Shop. All rights reserved.</p>
-            <p class="small mb-0" style="color: #8a97a8;">Design & Developed by <span style="color: #66fcf1; font-weight: bold;">Nguyen Xuan Vinh</span>.</p>
+            <p class="small mb-0" style="color: #8a97a8;">Design & Developed by <span style="color: #66fcf1; font-weight: bold;">Nguyễn Xuân Vinh</span>.</p>
         </div>
     </div>
 </footer>
@@ -811,7 +927,7 @@
         document.getElementById('shop-section').scrollIntoView({behavior: 'smooth', block: 'start'});
     }
 
-    // === WINNER TICKER ===
+    // === PREMIUM WINNER TICKER ===
     document.addEventListener("DOMContentLoaded", function() {
         fetch('/api/public/winners')
             .then(response => {
@@ -824,22 +940,26 @@
                 if (data && data.length > 0) {
                     bar.style.display = 'block';
                     let html = '';
+                    // Triple the data for seamless loop
                     const loopData = [...data, ...data, ...data];
                     loopData.forEach(w => {
                         html += `
                             <span class="winner-item">
-                                <i class="fas fa-bullhorn" style="color: #66fcf1;"></i>
-                                Chúc mừng <span class="winner-highlight">${w.user}</span>
-                                đã mở ra <span class="rank-tag">RANK S</span>
-                                <span style="color: #ffd700;">${w.item}</span>
-                                trong hộp ${w.box}!
+                                <i class="fas fa-trophy winner-icon"></i>
+                                <span>Chúc mừng</span>
+                                <span class="winner-highlight">${w.user}</span>
+                                <span>đã mở ra</span>
+                                <span class="rank-tag">RANK S</span>
+                                <span class="winner-item-name">${w.item}</span>
+                                <span>trong hộp</span>
+                                <span class="winner-box-name">${w.box}</span>!
                             </span>
                         `;
                     });
                     content.innerHTML = html;
                 }
             })
-            .catch(err => console.log("Chưa có API winner"));
+            .catch(err => console.log("Không có dữ liệu winner"));
     });
 
     // === OPEN BOX ===
@@ -853,6 +973,7 @@
             timerProgressBar: true,
             background: 'linear-gradient(135deg, #0a0e27, #1a1f3a)',
             color: '#fff',
+            showConfirmButton: false,
             didOpen: () => { Swal.showLoading() }
         });
 
